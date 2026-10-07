@@ -5,119 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de tickets Vidya Force 2.0</title>
     
-    <!-- Favicon da Aba - V em Lilás (#c084fc) -->
+    <!-- Favicon V em Lilás -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='25' fill='%23c084fc'/%3E%3Ctext x='50' y='72' font-size='65' font-weight='900' font-family='Arial, sans-serif' fill='white' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ícones Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <header class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <!-- Logotipo V em Lilás -->
-                <div class="w-10 h-10 bg-[#c084fc] text-white font-black rounded-xl flex items-center justify-center text-xl shadow-md tracking-wider">
+                <div class="w-10 h-10 bg-purple-400 text-white font-black rounded-xl flex items-center justify-center text-xl shadow-md">
                     V
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl font-bold tracking-wide">Gestão de tickets Vidya Force 2.0</h1>
-                    <p class="text-xs text-slate-400">Painel de Acompanhamento & Roadmap de Implantação</p>
+                    <h1 class="text-xl font-bold tracking-wide">Gestão de tickets Vidya Force 2.0</h1>
+                    <p class="text-xs text-slate-400">Acompanhamento e Implantação por Cliente</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-2 flex-wrap">
-                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-                    Exportar Planilha
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="exportBackupJSON()" title="Baixar cópia de segurança de todos os dados" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Backup (.json)
                 </button>
-                <button onclick="openActionModal()" class="bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="list-checks" class="w-4 h-4"></i>
-                    + Ação Implantação
+                <label title="Restaurar cópia de segurança" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Restaurar
+                    <input type="file" id="importBackupInput" onchange="importBackupJSON(event)" accept=".json" class="hidden">
+                </label>
+                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Planilha (.CSV)
                 </button>
-                <button onclick="openTicketModal()" class="bg-[#9333ea] hover:bg-[#7e22ce] text-white px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    Novo Ticket
+                <button onclick="openActionModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="list-checks" class="w-3.5 h-3.5"></i> Nova Ação
+                </button>
+                <button onclick="openTicketModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Novo Ticket
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
         <!-- Abas dos Clientes -->
-        <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between overflow-x-auto gap-2">
-            <div class="flex gap-1.5 overflow-x-auto py-1" id="clientTabs">
-                <!-- Tabs rendered dynamically -->
-            </div>
-            <button onclick="addNewClientPrompt()" class="text-xs font-semibold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 px-3 py-2 rounded-xl border border-purple-200 transition flex items-center gap-1.5 shrink-0 ml-2">
+        <div class="border-b border-slate-200 flex items-center justify-between overflow-x-auto pb-2">
+            <div class="flex gap-2" id="clientTabs"></div>
+            <button onclick="addNewClientPrompt()" class="text-xs text-purple-600 hover:text-purple-800 font-medium px-2.5 py-1.5 rounded-lg border border-purple-200 hover:bg-purple-50 flex items-center gap-1 shrink-0">
                 <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> + Cliente
             </button>
         </div>
 
-        <!-- MÓDULO DE AÇÕES DE IMPLANTAÇÃO DA VERSÃO 2.0 -->
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+        <!-- Seção: Plano de Ações de Implantação 2.0 -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
                 <div>
-                    <div class="flex items-center gap-2">
-                        <span class="p-1.5 bg-purple-100 text-purple-700 rounded-lg">
-                            <i data-lucide="rocket" class="w-4 h-4"></i>
-                        </span>
-                        <h2 class="text-base font-bold text-slate-800" id="roadmapSectionTitle">Plano & Ações de Implantação Vidya Force 2.0</h2>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-0.5">Acompanhamento de etapas e checklist para liberação da nova versão nos clientes</p>
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="flag" class="w-5 h-5 text-purple-600"></i>
+                        Ações de Implantação da Versão 2.0
+                        <span id="actionClientTitle" class="text-purple-600 font-extrabold">(Todos os Clientes)</span>
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Etapas e progresso da migração para o Vidya Force 2.0</p>
                 </div>
-                <div id="roadmapHeaderActions" class="flex items-center gap-2">
-                    <!-- Button populated via JS -->
+                
+                <!-- Barra de Progresso Geral ou do Cliente -->
+                <div class="w-full md:w-72 bg-slate-100 p-3 rounded-xl border border-slate-200 shrink-0">
+                    <div class="flex justify-between items-center mb-1 text-xs font-semibold">
+                        <span class="text-slate-600">Progresso Geral</span>
+                        <span id="actionsProgressPercent" class="text-purple-700 font-bold">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="actionsProgressBar" class="bg-purple-600 h-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Conteúdo Dinâmico do Roadmap -->
-            <div id="roadmapContent">
-                <!-- Rendered dynamically -->
-            </div>
+            <!-- Lista de Ações -->
+            <div id="actionsContainer" class="space-y-2"></div>
         </section>
 
         <!-- Métricas Rápidas dos Tickets -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80">
-                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Total de Tickets</span>
-                <p id="statTotal" class="text-2xl font-black text-slate-800 mt-1">0</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Tickets Exibidos</span>
+                <p id="statTotal" class="text-2xl font-bold text-slate-800 mt-1">0</p>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80">
-                <span class="text-[11px] text-blue-600 font-bold uppercase tracking-wider">Em Andamento</span>
-                <p id="statInProgress" class="text-2xl font-black text-blue-600 mt-1">0</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <span class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Em Andamento</span>
+                <p id="statInProgress" class="text-2xl font-bold text-blue-600 mt-1">0</p>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80">
-                <span class="text-[11px] text-amber-600 font-bold uppercase tracking-wider">Aguardando Cliente</span>
-                <p id="statWaiting" class="text-2xl font-black text-amber-600 mt-1">0</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <span class="text-xs text-amber-600 font-semibold uppercase tracking-wider">Aguardando Cliente</span>
+                <p id="statWaiting" class="text-2xl font-bold text-amber-600 mt-1">0</p>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200/80">
-                <span class="text-[11px] text-emerald-600 font-bold uppercase tracking-wider">Concluídos</span>
-                <p id="statDone" class="text-2xl font-black text-emerald-600 mt-1">0</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <span class="text-xs text-emerald-600 font-semibold uppercase tracking-wider">Concluídos</span>
+                <p id="statDone" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
             </div>
         </div>
 
-        <!-- MÓDULO DE TICKETS -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <i data-lucide="ticket" class="w-5 h-5 text-purple-600"></i>
-                <h3 class="font-bold text-slate-800 text-sm">Tickets & Chamados</h3>
+        <!-- Busca e Filtros -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center">
+            <div class="relative w-full md:w-96">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="render()" placeholder="Buscar por título, cliente ou descrição..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
             </div>
-            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                <div class="relative w-full sm:w-80">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="searchInput" oninput="render()" placeholder="Buscar por título, cliente ou descrição..." class="w-full pl-9 pr-4 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                </div>
-                <select id="statusFilter" onchange="render()" class="w-full sm:w-auto text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none font-medium text-slate-700">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <label class="text-xs text-slate-500 font-medium whitespace-nowrap">Status Ticket:</label>
+                <select id="statusFilter" onchange="render()" class="w-full md:w-auto text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none">
                     <option value="TODOS">Todos os Status</option>
                     <option value="Aberto">Aberto</option>
                     <option value="Em Andamento">Em Andamento</option>
@@ -128,61 +127,54 @@
         </div>
 
         <!-- Tabela de Tickets -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-100/80 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
-                            <th class="p-3.5">Cliente</th>
-                            <th class="p-3.5">Título & Descrição</th>
-                            <th class="p-3.5">Link Chamado</th>
-                            <th class="p-3.5">Data Prevista</th>
-                            <th class="p-3.5">Status</th>
-                            <th class="p-3.5">Solução / Observação</th>
-                            <th class="p-3.5 text-center">Ações</th>
+                        <tr class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                            <th class="p-4">Cliente</th>
+                            <th class="p-4">Título & Descrição</th>
+                            <th class="p-4">Link</th>
+                            <th class="p-4">Data Prevista</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4">Solução / Observação</th>
+                            <th class="p-4 text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="ticketsTableBody" class="divide-y divide-slate-100 text-xs">
-                        <!-- Dynamic content -->
-                    </tbody>
+                    <tbody id="ticketsTableBody" class="divide-y divide-slate-200 text-sm"></tbody>
                 </table>
             </div>
             <div id="emptyState" class="hidden p-8 text-center text-slate-500">
-                <i data-lucide="inbox" class="w-10 h-10 mx-auto text-slate-300 mb-2"></i>
-                <p class="text-xs">Nenhum ticket encontrado para os filtros selecionados.</p>
+                <i data-lucide="inbox" class="w-12 h-12 mx-auto text-slate-300 mb-2"></i>
+                <p>Nenhum ticket encontrado para os filtros selecionados.</p>
             </div>
         </div>
-
     </main>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
-        Gestão de tickets Vidya Force 2.0 &bull; Sistema de Acompanhamento de Clientes
+        Gestão de tickets Vidya Force 2.0 &bull; Dados salvos automaticamente no navegador
     </footer>
 
-    <!-- Modal de Ticket -->
+    <!-- Modal de Cadastrar/Editar Ticket -->
     <div id="ticketModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                <h3 id="modalTitle" class="text-base font-bold text-slate-800">Novo Ticket</h3>
+                <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Novo Ticket</h3>
                 <button onclick="closeTicketModal()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            
-            <form id="ticketForm" onsubmit="saveTicket(event)" class="space-y-3.5">
+            <form id="ticketForm" onsubmit="saveTicket(event)" class="space-y-4">
                 <input type="hidden" id="ticketId">
-
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Cliente *</label>
-                        <select id="formClient" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                            <!-- JS filled -->
-                        </select>
+                        <select id="formClient" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Status *</label>
-                        <select id="formStatus" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <select id="formStatus" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
                             <option value="Aberto">Aberto</option>
                             <option value="Em Andamento">Em Andamento</option>
                             <option value="Aguardando Cliente">Aguardando Cliente</option>
@@ -190,175 +182,206 @@
                         </select>
                     </div>
                 </div>
-
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Título do Ticket *</label>
-                    <input type="text" id="formTitle" required placeholder="Ex: Ajuste na transcodificação de vídeos" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <input type="text" id="formTitle" required placeholder="Ex: Validação das chaves da API" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
                 </div>
-
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Link do Chamado (Jira/Trello/etc)</label>
-                        <input type="url" id="formLink" placeholder="https://..." class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Link do Chamado</label>
+                        <input type="url" id="formLink" placeholder="https://..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Data Prevista</label>
-                        <input type="date" id="formDueDate" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <input type="date" id="formDueDate" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
                     </div>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Descrição do Problema</label>
-                    <textarea id="formDescription" rows="2.5" placeholder="Descreva sucintamente a necessidade..." class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Descrição</label>
+                    <textarea id="formDescription" rows="3" placeholder="Detalhes do chamado..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
                 </div>
-
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Solução / Acompanhamento</label>
-                    <textarea id="formSolution" rows="2" placeholder="Detalhes do andamento ou resolução..." class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
+                    <textarea id="formSolution" rows="2" placeholder="Resolução ou status atual..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
                 </div>
-
-                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeTicketModal()" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold shadow-sm">Salvar Ticket</button>
+                <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeTicketModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-sm">Salvar Ticket</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal de Ação de Implantação -->
+    <!-- Modal de Cadastrar/Editar Ação de Implantação -->
     <div id="actionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                <h3 id="actionModalTitle" class="text-base font-bold text-slate-800">Nova Ação de Implantação</h3>
+                <h3 id="actionModalTitle" class="text-lg font-bold text-slate-800">Nova Ação de Implantação</h3>
                 <button onclick="closeActionModal()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            
-            <form id="actionForm" onsubmit="saveAction(event)" class="space-y-3.5">
+            <form id="actionForm" onsubmit="saveAction(event)" class="space-y-4">
                 <input type="hidden" id="actionId">
-
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Cliente *</label>
-                        <select id="actionFormClient" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                            <!-- JS filled -->
-                        </select>
+                        <select id="actionFormClient" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Status da Etapa *</label>
-                        <select id="actionFormStatus" required class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Status da Ação *</label>
+                        <select id="actionFormStatus" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                             <option value="Pendente">Pendente</option>
                             <option value="Em Andamento">Em Andamento</option>
                             <option value="Concluído">Concluído</option>
                         </select>
                     </div>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Título da Ação / Etapa *</label>
-                    <input type="text" id="actionFormTitle" required placeholder="Ex: Validação da nova chave de API com time de TI" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Título da Ação *</label>
+                    <input type="text" id="actionFormTitle" required placeholder="Ex: Homologação do Player em ambiente Sandbox" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável</label>
+                        <input type="text" id="actionFormOwner" placeholder="Ex: João / Equipe Vidya" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Data Limite</label>
+                        <input type="date" id="actionFormDueDate" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Data Prevista de Conclusão</label>
-                    <input type="date" id="actionFormDueDate" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Observação / Progresso</label>
+                    <textarea id="actionFormNotes" rows="2" placeholder="Detalhes do andamento..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Observações / Detalhes</label>
-                    <textarea id="actionFormNotes" rows="2.5" placeholder="Instruções adicionais ou pré-requisitos para esta etapa..." class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
-                </div>
-
-                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold shadow-sm">Salvar Ação</button>
+                <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-sm">Salvar Ação</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- JavaScript da Aplicação -->
     <script>
-        // Dados Padrão Iniciais
+        const STORAGE_KEY_CLIENTS = "vidya_clients_v2";
+        const STORAGE_KEY_TICKETS = "vidya_tickets_v2";
+        const STORAGE_KEY_ACTIONS = "vidya_actions_v2";
+
         const defaultClients = ["Unidas", "Social"];
-        
         const defaultActions = [
-            { id: "act-101", client: "Unidas", title: "Mapeamento das APIs e credenciais do Vidya Force 2.0", status: "Concluído", dueDate: "2026-10-02", notes: "Integrações validadas pelo time técnico." },
-            { id: "act-102", client: "Unidas", title: "Treinamento da equipe de suporte interna do cliente", status: "Em Andamento", dueDate: "2026-10-12", notes: "Treinamento agendado em 2 turmas." },
-            { id: "act-103", client: "Unidas", title: "Migração completa da base de vídeos ativos", status: "Pendente", dueDate: "2026-10-25", notes: "Aguardando homologação final." },
-            { id: "act-201", client: "Social", title: "Configuração do ambiente sandbox da versão 2.0", status: "Concluído", dueDate: "2026-10-01", notes: "Ambiente liberado." },
-            { id: "act-202", client: "Social", title: "Ajuste e validação de Player customizado", status: "Em Andamento", dueDate: "2026-10-18", notes: "Ajustando reprodução mobile." }
+            { id: "act-1", client: "Unidas", title: "Alinhamento Inicial e Mapeamento de APIs 2.0", owner: "Carlos / Vidya", status: "Concluído", dueDate: "2026-09-10", notes: "Escopo validado com a equipe técnica." },
+            { id: "act-2", client: "Unidas", title: "Migração de Credenciais de Homologação", owner: "Suporte", status: "Em Andamento", dueDate: "2026-10-15", notes: "Aguardando envio dos tokens definitivos." },
+            { id: "act-3", client: "Social", title: "Treinamento do Player 2.0 com Time Operacional", owner: "Ana / Vidya", status: "Pendente", dueDate: "2026-10-25", notes: "Agendar reunião com os gestores." }
         ];
-
         const defaultTickets = [
-            {
-                id: "101",
-                client: "Unidas",
-                title: "Ajuste na API de Transcodificação em Lote",
-                link: "https://jira.exemplo.com/browse/VF-101",
-                description: "Retorno de callback com latência acima do especificado.",
-                status: "Em Andamento",
-                dueDate: "2026-10-15",
-                solution: "Infraestrutura analisando filas de processamento no servidor."
-            },
-            {
-                id: "102",
-                client: "Social",
-                title: "Otimização do player em conexões mobile 4G",
-                link: "https://trello.com/c/vf102",
-                description: "Reduzir tempo de buffering na inicialização dos vídeos no 2.0.",
-                status: "Aberto",
-                dueDate: "2026-10-20",
-                solution: "Agendado para o sprint do time do player."
-            },
-            {
-                id: "103",
-                client: "Unidas",
-                title: "Relatório de Analytics de Execução",
-                link: "https://jira.exemplo.com/browse/VF-103",
-                description: "Exportação de métricas em CSV para o time de comunicação.",
-                status: "Concluído",
-                dueDate: "2026-10-05",
-                solution: "Recurso implantado com sucesso no painel."
-            }
+            { id: "101", client: "Unidas", title: "Ajuste na API de Integração de Vídeos", link: "https://jira.exemplo.com/browse/VF-101", description: "Envio de callbacks com timeout intermitente.", status: "Em Andamento", dueDate: "2026-10-15", solution: "Time de infraesturura analisando logs." },
+            { id: "102", client: "Social", title: "Otimização do player em conexões mobile 4G", link: "https://trello.com/c/vf102", description: "Reduzir buffering no carregamento inicial.", status: "Aberto", dueDate: "2026-10-20", solution: "Planejado para o próximo sprint." }
         ];
 
-        // Carregamento de Estado do LocalStorage
-        let clients = JSON.parse(localStorage.getItem('vf_clients')) || defaultClients;
-        let actions = JSON.parse(localStorage.getItem('vf_actions')) || defaultActions;
-        let tickets = JSON.parse(localStorage.getItem('vf_tickets')) || defaultTickets;
+        let clients = [];
+        let tickets = [];
+        let actions = [];
         let currentClientFilter = "TODOS";
 
+        // Inicializador principal
         document.addEventListener("DOMContentLoaded", () => {
+            loadStoredData();
             renderTabs();
-            render();
             populateClientDropdowns();
+            render();
         });
 
-        function saveData() {
-            localStorage.setItem('vf_clients', JSON.stringify(clients));
-            localStorage.setItem('vf_actions', JSON.stringify(actions));
-            localStorage.setItem('vf_tickets', JSON.stringify(tickets));
+        // CARREGA DO LOCALSTORAGE (OU CRIA OS PADRÕES SE FOR A 1ª VEZ)
+        function loadStoredData() {
+            try {
+                const storedClients = localStorage.getItem(STORAGE_KEY_CLIENTS);
+                const storedTickets = localStorage.getItem(STORAGE_KEY_TICKETS);
+                const storedActions = localStorage.getItem(STORAGE_KEY_ACTIONS);
+
+                clients = storedClients ? JSON.parse(storedClients) : defaultClients;
+                tickets = storedTickets ? JSON.parse(storedTickets) : defaultTickets;
+                actions = storedActions ? JSON.parse(storedActions) : defaultActions;
+
+                // Garante que os dados padrões sejam persistidos de imediato caso não existissem
+                if (!storedClients) saveAllData();
+            } catch (e) {
+                console.error("Erro ao carregar dados do LocalStorage:", e);
+                clients = defaultClients;
+                tickets = defaultTickets;
+                actions = defaultActions;
+            }
         }
 
+        // SALVA TUDO NO LOCALSTORAGE DA MÁQUINA
+        function saveAllData() {
+            try {
+                localStorage.setItem(STORAGE_KEY_CLIENTS, JSON.stringify(clients));
+                localStorage.setItem(STORAGE_KEY_TICKETS, JSON.stringify(tickets));
+                localStorage.setItem(STORAGE_KEY_ACTIONS, JSON.stringify(actions));
+            } catch (e) {
+                alert("Erro ao salvar dados localmente. Verifique se o seu navegador permite armazenamento local.");
+            }
+        }
+
+        // EXPORTAR BACKUP JSON (Para levar para outra máquina)
+        function exportBackupJSON() {
+            const backupData = { clients, tickets, actions, date: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `vidyaforce_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // IMPORTAR BACKUP JSON
+        function importBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.clients && data.tickets && data.actions) {
+                        clients = data.clients;
+                        tickets = data.tickets;
+                        actions = data.actions;
+                        saveAllData();
+                        renderTabs();
+                        populateClientDropdowns();
+                        render();
+                        alert("Backup restaurado com sucesso!");
+                    } else {
+                        alert("Arquivo de backup inválido.");
+                    }
+                } catch (err) {
+                    alert("Erro ao ler o arquivo de backup.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Renderizar Abas de Clientes
         function renderTabs() {
-            const container = document.getElementById("clientTabs");
+            const tabsContainer = document.getElementById("clientTabs");
             let html = `
-                <button onclick="filterByClient('TODOS')" class="px-3.5 py-1.5 text-xs font-semibold rounded-xl whitespace-nowrap transition ${currentClientFilter === 'TODOS' ? 'bg-[#9333ea] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'}">
+                <button onclick="filterByClient('TODOS')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${currentClientFilter === 'TODOS' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
                     Todos os Clientes
                 </button>
             `;
-
             clients.forEach(c => {
                 const isActive = currentClientFilter === c;
                 html += `
-                    <button onclick="filterByClient('${c}')" class="px-3.5 py-1.5 text-xs font-semibold rounded-xl whitespace-nowrap transition ${isActive ? 'bg-[#9333ea] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'}">
+                    <button onclick="filterByClient('${c}')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${isActive ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
                         ${c}
                     </button>
                 `;
             });
-
-            container.innerHTML = html;
+            tabsContainer.innerHTML = html;
         }
 
         function filterByClient(client) {
@@ -368,15 +391,15 @@
         }
 
         function addNewClientPrompt() {
-            const newClient = prompt("Digite o nome do novo cliente para a carteira Vidya Force 2.0:");
+            const newClient = prompt("Digite o nome do novo cliente:");
             if (newClient && newClient.trim() !== "") {
-                const formatted = newClient.trim();
-                if (!clients.includes(formatted)) {
-                    clients.push(formatted);
-                    saveData();
+                const nameFormatted = newClient.trim();
+                if (!clients.includes(nameFormatted)) {
+                    clients.push(nameFormatted);
+                    saveAllData();
                     renderTabs();
                     populateClientDropdowns();
-                    filterByClient(formatted);
+                    filterByClient(nameFormatted);
                 }
             }
         }
@@ -385,213 +408,93 @@
             const ticketSelect = document.getElementById("formClient");
             const actionSelect = document.getElementById("actionFormClient");
             const options = clients.map(c => `<option value="${c}">${c}</option>`).join('');
-            
             ticketSelect.innerHTML = options;
             actionSelect.innerHTML = options;
         }
 
-        function renderRoadmap() {
-            const titleEl = document.getElementById("roadmapSectionTitle");
-            const actionsHeaderEl = document.getElementById("roadmapHeaderActions");
-            const contentEl = document.getElementById("roadmapContent");
-
-            if (currentClientFilter === "TODOS") {
-                titleEl.innerText = "Progresso de Implantação 2.0 por Cliente";
-                actionsHeaderEl.innerHTML = "";
-
-                let cardsHtml = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
-
-                clients.forEach(client => {
-                    const clientActions = actions.filter(a => a.client === client);
-                    const total = clientActions.length;
-                    const done = clientActions.filter(a => a.status === "Concluído").length;
-                    const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-
-                    cardsHtml += `
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 hover:shadow-md transition">
-                            <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-bold text-slate-800 text-sm">${client}</h4>
-                                <span class="text-xs font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">${percent}%</span>
-                            </div>
-                            <!-- Barra de Progresso -->
-                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-3">
-                                <div class="bg-purple-600 h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
-                            </div>
-                            <div class="flex justify-between items-center text-[11px] text-slate-500">
-                                <span>${done} de ${total} etapas concluídas</span>
-                                <button onclick="filterByClient('${client}')" class="text-purple-600 font-semibold hover:underline">Ver Plano &rarr;</button>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                cardsHtml += `</div>`;
-                contentEl.innerHTML = cardsHtml;
-
-            } else {
-                titleEl.innerText = `Plano de Implantação 2.0 - ${currentClientFilter}`;
-                actionsHeaderEl.innerHTML = `
-                    <button onclick="openActionModal('${currentClientFilter}')" class="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nova Etapa
-                    </button>
-                `;
-
-                const clientActions = actions.filter(a => a.client === currentClientFilter);
-                const total = clientActions.length;
-                const done = clientActions.filter(a => a.status === "Concluído").length;
-                const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-
-                let html = `
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs font-bold text-slate-700">Status Geral da Implantação no Cliente</span>
-                                <span class="text-xs font-extrabold text-purple-700">${percent}% Concluído</span>
-                            </div>
-                            <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                                <div class="bg-purple-600 h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
-                            </div>
-                        </div>
-                        <div class="text-xs text-slate-500 whitespace-nowrap font-medium">
-                            ${done} de ${total} etapas finalizadas
-                        </div>
-                    </div>
-                `;
-
-                if (clientActions.length === 0) {
-                    html += `
-                        <div class="text-center py-6 text-slate-400 text-xs">
-                            Nenhuma ação de implantação cadastrada para <strong>${currentClientFilter}</strong>.
-                        </div>
-                    `;
-                } else {
-                    html += `<div class="space-y-2">`;
-                    clientActions.forEach(a => {
-                        const statusColors = {
-                            "Pendente": "bg-slate-100 text-slate-700 border-slate-300",
-                            "Em Andamento": "bg-blue-50 text-blue-700 border-blue-200",
-                            "Concluído": "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        };
-
-                        const dateStr = a.dueDate ? new Date(a.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
-
-                        html += `
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white rounded-xl border border-slate-200 hover:border-purple-200 transition">
-                                <div class="flex items-start gap-2.5">
-                                    <button onclick="toggleActionStatus('${a.id}')" title="Alternar Status Rápidamente" class="mt-0.5 text-slate-400 hover:text-purple-600 transition">
-                                        <i data-lucide="${a.status === 'Concluído' ? 'check-circle-2' : 'circle'}" class="w-4 h-4 ${a.status === 'Concluído' ? 'text-emerald-600 fill-emerald-100' : ''}"></i>
-                                    </button>
-                                    <div>
-                                        <p class="text-xs font-semibold ${a.status === 'Concluído' ? 'line-through text-slate-400' : 'text-slate-800'}">${a.title}</p>
-                                        ${a.notes ? `<p class="text-[11px] text-slate-500 mt-0.5">${a.notes}</p>` : ''}
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3 shrink-0 ml-6 sm:ml-0">
-                                    <span class="text-[11px] text-slate-500 font-medium">${dateStr}</span>
-                                    <select onchange="updateActionStatus('${a.id}', this.value)" class="text-[11px] font-semibold rounded-lg px-2 py-1 border ${statusColors[a.status]} focus:outline-none cursor-pointer">
-                                        <option value="Pendente" ${a.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                                        <option value="Em Andamento" ${a.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
-                                        <option value="Concluído" ${a.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
-                                    </select>
-                                    <div class="flex items-center gap-1">
-                                        <button onclick="editAction('${a.id}')" class="p-1 text-slate-400 hover:text-purple-600"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
-                                        <button onclick="deleteAction('${a.id}')" class="p-1 text-slate-400 hover:text-red-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    html += `</div>`;
-                }
-
-                contentEl.innerHTML = html;
-            }
-
+        function render() {
+            renderActionsSection();
+            renderTicketsTable();
             lucide.createIcons();
         }
 
-        function openActionModal(client = null) {
-            document.getElementById("actionModal").classList.remove("hidden");
-            populateClientDropdowns();
-            document.getElementById("actionForm").reset();
-            document.getElementById("actionId").value = "";
-            document.getElementById("actionModalTitle").innerText = "Nova Ação de Implantação";
+        // RENDERIZAÇÃO DA SEÇÃO DE AÇÕES DE IMPLANTAÇÃO
+        function renderActionsSection() {
+            const titleEl = document.getElementById("actionClientTitle");
+            const container = document.getElementById("actionsContainer");
 
-            if (client && client !== "TODOS") {
-                document.getElementById("actionFormClient").value = client;
-            } else if (currentClientFilter !== "TODOS") {
-                document.getElementById("actionFormClient").value = currentClientFilter;
-            }
-        }
+            titleEl.innerText = currentClientFilter === "TODOS" ? "(Todos os Clientes)" : `- ${currentClientFilter}`;
 
-        function closeActionModal() {
-            document.getElementById("actionModal").classList.add("hidden");
-        }
+            const filteredActions = currentClientFilter === "TODOS" ? actions : actions.filter(a => a.client === currentClientFilter);
 
-        function saveAction(e) {
-            e.preventDefault();
-            const id = document.getElementById("actionId").value;
-            const client = document.getElementById("actionFormClient").value;
-            const title = document.getElementById("actionFormTitle").value;
-            const status = document.getElementById("actionFormStatus").value;
-            const dueDate = document.getElementById("actionFormDueDate").value;
-            const notes = document.getElementById("actionFormNotes").value;
+            const doneCount = filteredActions.filter(a => a.status === "Concluído").length;
+            const totalCount = filteredActions.length;
+            const percent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
-            if (id) {
-                const index = actions.findIndex(a => a.id === id);
-                if (index !== -1) {
-                    actions[index] = { id, client, title, status, dueDate, notes };
-                }
-            } else {
-                const newId = `act-${Date.now()}`;
-                actions.push({ id: newId, client, title, status, dueDate, notes });
+            document.getElementById("actionsProgressPercent").innerText = `${percent}%`;
+            document.getElementById("actionsProgressBar").style.width = `${percent}%`;
+
+            if (filteredActions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-slate-400 text-xs">
+                        Nenhuma ação de implantação cadastrada para ${currentClientFilter === 'TODOS' ? 'os clientes' : currentClientFilter}.
+                    </div>
+                `;
+                return;
             }
 
-            saveData();
-            closeActionModal();
-            render();
-        }
+            container.innerHTML = filteredActions.map(a => {
+                const statusColors = {
+                    "Pendente": "bg-slate-100 text-slate-600 border-slate-200",
+                    "Em Andamento": "bg-blue-50 text-blue-700 border-blue-200",
+                    "Concluído": "bg-emerald-50 text-emerald-700 border-emerald-200"
+                };
 
-        function editAction(id) {
-            const action = actions.find(a => a.id === id);
-            if (!action) return;
+                const dateText = a.dueDate ? new Date(a.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
 
-            openActionModal();
-            document.getElementById("actionModalTitle").innerText = "Editar Ação de Implantação";
-            document.getElementById("actionId").value = action.id;
-            document.getElementById("actionFormClient").value = action.client;
-            document.getElementById("actionFormTitle").value = action.title;
-            document.getElementById("actionFormStatus").value = action.status;
-            document.getElementById("actionFormDueDate").value = action.dueDate || '';
-            document.getElementById("actionFormNotes").value = action.notes || '';
+                return `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 hover:bg-slate-100/80 transition">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">${a.client}</span>
+                                <h4 class="font-semibold text-slate-800 text-sm">${a.title}</h4>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs text-slate-500 mt-1 flex-wrap">
+                                ${a.owner ? `<span><strong class="text-slate-600">Resp:</strong> ${a.owner}</span>` : ''}
+                                <span><strong class="text-slate-600">Prazo:</strong> ${dateText}</span>
+                                ${a.notes ? `<span class="italic text-slate-600">"${a.notes}"</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 w-full md:w-auto justify-between md:justify-end">
+                            <select onchange="updateActionStatus('${a.id}', this.value)" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border ${statusColors[a.status]} focus:outline-none cursor-pointer">
+                                <option value="Pendente" ${a.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                                <option value="Em Andamento" ${a.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                                <option value="Concluído" ${a.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                            </select>
+                            <div class="flex items-center gap-1">
+                                <button onclick="editAction('${a.id}')" title="Editar Ação" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteAction('${a.id}')" title="Excluir Ação" class="p-1.5 text-slate-400 hover:text-red-600 rounded">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function updateActionStatus(id, newStatus) {
-            const index = actions.findIndex(a => a.id === id);
-            if (index !== -1) {
-                actions[index].status = newStatus;
-                saveData();
+            const action = actions.find(a => a.id === id);
+            if (action) {
+                action.status = newStatus;
+                saveAllData();
                 render();
             }
         }
 
-        function toggleActionStatus(id) {
-            const index = actions.findIndex(a => a.id === id);
-            if (index !== -1) {
-                actions[index].status = actions[index].status === 'Concluído' ? 'Em Andamento' : 'Concluído';
-                saveData();
-                render();
-            }
-        }
-
-        function deleteAction(id) {
-            if (confirm("Deseja excluir esta etapa da implantação?")) {
-                actions = actions.filter(a => a.id !== id);
-                saveData();
-                render();
-            }
-        }
-
+        // RENDERIZAÇÃO DA TABELA DE TICKETS
         function getFilteredTickets() {
             const search = document.getElementById("searchInput").value.toLowerCase();
             const status = document.getElementById("statusFilter").value;
@@ -602,7 +505,6 @@
                 const matchSearch = t.title.toLowerCase().includes(search) || 
                                     t.client.toLowerCase().includes(search) || 
                                     (t.description && t.description.toLowerCase().includes(search));
-
                 return matchClient && matchStatus && matchSearch;
             });
         }
@@ -612,7 +514,6 @@
             const tbody = document.getElementById("ticketsTableBody");
             const emptyState = document.getElementById("emptyState");
 
-            // Atualizar contadores
             document.getElementById("statTotal").innerText = filtered.length;
             document.getElementById("statInProgress").innerText = filtered.filter(t => t.status === "Em Andamento").length;
             document.getElementById("statWaiting").innerText = filtered.filter(t => t.status === "Aguardando Cliente").length;
@@ -637,34 +538,32 @@
                 const dateFormatted = t.dueDate ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
 
                 return `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="p-3.5 whitespace-nowrap">
-                            <span class="font-semibold text-purple-900 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100 text-xs">${t.client}</span>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 whitespace-nowrap">
+                            <span class="font-semibold text-purple-900 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100 text-xs">${t.client}</span>
                         </td>
-                        <td class="p-3.5">
-                            <div class="font-bold text-slate-800">${t.title}</div>
-                            ${t.description ? `<div class="text-[11px] text-slate-500 mt-0.5 line-clamp-2">${t.description}</div>` : ''}
+                        <td class="p-4">
+                            <div class="font-semibold text-slate-800">${t.title}</div>
+                            ${t.description ? `<div class="text-xs text-slate-500 mt-0.5 line-clamp-2">${t.description}</div>` : ''}
                         </td>
-                        <td class="p-3.5 whitespace-nowrap text-xs">
-                            ${t.link ? `<a href="${t.link}" target="_blank" class="text-purple-600 hover:underline font-semibold flex items-center gap-1"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Abrir Link</a>` : '<span class="text-slate-400">-</span>'}
+                        <td class="p-4 whitespace-nowrap text-xs">
+                            ${t.link ? `<a href="${t.link}" target="_blank" class="text-purple-600 hover:underline flex items-center gap-1"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver Chamado</a>` : '<span class="text-slate-400">-</span>'}
                         </td>
-                        <td class="p-3.5 whitespace-nowrap text-xs text-slate-600">
-                            ${dateFormatted}
-                        </td>
-                        <td class="p-3.5 whitespace-nowrap">
-                            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusBadges[t.status] || 'bg-slate-100'}">
+                        <td class="p-4 whitespace-nowrap text-xs text-slate-600">${dateFormatted}</td>
+                        <td class="p-4 whitespace-nowrap">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${statusBadges[t.status] || 'bg-slate-100'}">
                                 ${t.status}
                             </span>
                         </td>
-                        <td class="p-3.5 text-xs text-slate-600 max-w-xs">
-                            ${t.solution ? `<div class="bg-slate-50 p-2 rounded-lg border border-slate-200/80 text-[11px] text-slate-700">${t.solution}</div>` : '<span class="text-slate-400 text-[11px]">Pendente</span>'}
+                        <td class="p-4 text-xs text-slate-600 max-w-xs">
+                            ${t.solution ? `<div class="bg-slate-50 p-2 rounded border border-slate-200 text-slate-700">${t.solution}</div>` : '<span class="text-slate-400">Pendente</span>'}
                         </td>
-                        <td class="p-3.5 text-center whitespace-nowrap">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="editTicket('${t.id}')" title="Editar" class="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition">
+                        <td class="p-4 text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="editTicket('${t.id}')" title="Editar Ticket" class="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded transition">
                                     <i data-lucide="pencil" class="w-4 h-4"></i>
                                 </button>
-                                <button onclick="deleteTicket('${t.id}')" title="Excluir" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition">
+                                <button onclick="deleteTicket('${t.id}')" title="Excluir Ticket" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                 </button>
                             </div>
@@ -672,15 +571,9 @@
                     </tr>
                 `;
             }).join('');
-
-            lucide.createIcons();
         }
 
-        function render() {
-            renderRoadmap();
-            renderTicketsTable();
-        }
-
+        // MODAL TICKET
         function openTicketModal(ticket = null) {
             document.getElementById("ticketModal").classList.remove("hidden");
             populateClientDropdowns();
@@ -699,9 +592,7 @@
                 document.getElementById("modalTitle").innerText = "Novo Ticket";
                 document.getElementById("ticketForm").reset();
                 document.getElementById("ticketId").value = "";
-                if (currentClientFilter !== "TODOS") {
-                    document.getElementById("formClient").value = currentClientFilter;
-                }
+                if (currentClientFilter !== "TODOS") document.getElementById("formClient").value = currentClientFilter;
             }
         }
 
@@ -722,15 +613,12 @@
 
             if (id) {
                 const index = tickets.findIndex(t => t.id === id);
-                if (index !== -1) {
-                    tickets[index] = { id, client, title, link, status, dueDate, description, solution };
-                }
+                if (index !== -1) tickets[index] = { id, client, title, link, status, dueDate, description, solution };
             } else {
-                const newId = Date.now().toString();
-                tickets.push({ id: newId, client, title, link, status, dueDate, description, solution });
+                tickets.push({ id: Date.now().toString(), client, title, link, status, dueDate, description, solution });
             }
 
-            saveData();
+            saveAllData();
             closeTicketModal();
             render();
         }
@@ -743,22 +631,82 @@
         function deleteTicket(id) {
             if (confirm("Tem certeza que deseja excluir este ticket?")) {
                 tickets = tickets.filter(t => t.id !== id);
-                saveData();
+                saveAllData();
                 render();
             }
         }
 
-        // Exportação CSV
+        // MODAL AÇÕES
+        function openActionModal(action = null) {
+            document.getElementById("actionModal").classList.remove("hidden");
+            populateClientDropdowns();
+
+            if (action) {
+                document.getElementById("actionModalTitle").innerText = "Editar Ação de Implantação";
+                document.getElementById("actionId").value = action.id;
+                document.getElementById("actionFormClient").value = action.client;
+                document.getElementById("actionFormTitle").value = action.title;
+                document.getElementById("actionFormOwner").value = action.owner || '';
+                document.getElementById("actionFormStatus").value = action.status;
+                document.getElementById("actionFormDueDate").value = action.dueDate || '';
+                document.getElementById("actionFormNotes").value = action.notes || '';
+            } else {
+                document.getElementById("actionModalTitle").innerText = "Nova Ação de Implantação";
+                document.getElementById("actionForm").reset();
+                document.getElementById("actionId").value = "";
+                if (currentClientFilter !== "TODOS") document.getElementById("actionFormClient").value = currentClientFilter;
+            }
+        }
+
+        function closeActionModal() {
+            document.getElementById("actionModal").classList.add("hidden");
+        }
+
+        function saveAction(e) {
+            e.preventDefault();
+            const id = document.getElementById("actionId").value;
+            const client = document.getElementById("actionFormClient").value;
+            const title = document.getElementById("actionFormTitle").value;
+            const owner = document.getElementById("actionFormOwner").value;
+            const status = document.getElementById("actionFormStatus").value;
+            const dueDate = document.getElementById("actionFormDueDate").value;
+            const notes = document.getElementById("actionFormNotes").value;
+
+            if (id) {
+                const index = actions.findIndex(a => a.id === id);
+                if (index !== -1) actions[index] = { id, client, title, owner, status, dueDate, notes };
+            } else {
+                actions.push({ id: "act-" + Date.now(), client, title, owner, status, dueDate, notes });
+            }
+
+            saveAllData();
+            closeActionModal();
+            render();
+        }
+
+        function editAction(id) {
+            const action = actions.find(a => a.id === id);
+            if (action) openActionModal(action);
+        }
+
+        function deleteAction(id) {
+            if (confirm("Tem certeza que deseja excluir esta ação de implantação?")) {
+                actions = actions.filter(a => a.id !== id);
+                saveAllData();
+                render();
+            }
+        }
+
+        // EXPORTAR PLANILHA CSV
         function exportToCSV() {
-            const filteredTickets = getFilteredTickets();
-            if (filteredTickets.length === 0) {
+            const ticketsToExport = getFilteredTickets();
+            if (ticketsToExport.length === 0) {
                 alert("Nenhum ticket encontrado para exportar.");
                 return;
             }
 
             const headers = ["Cliente", "Título", "Link do Chamado", "Descrição", "Status", "Data Prevista", "Solução/Observação"];
-            
-            const rows = filteredTickets.map(t => [
+            const rows = ticketsToExport.map(t => [
                 `"${t.client}"`,
                 `"${t.title.replace(/"/g, '""')}"`,
                 `"${(t.link || '').replace(/"/g, '""')}"`,
@@ -769,7 +717,6 @@
             ]);
 
             const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(e => e.join(";"))].join("\n");
-            
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
