@@ -15,7 +15,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Header -->
+    <!-- Header Principal -->
     <header class="bg-slate-900 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -29,24 +29,28 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-                <!-- Status da Sincronização Google Sheets -->
+                <!-- Status da Sincronização Google Sheets por Cliente -->
                 <div id="sheetsSyncBadge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Google Sheets Ativo
+                    Sheets Vinculado
+                </div>
+                <div id="sheetsNotSyncBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    Sheets Não Vinculado
                 </div>
 
-                <!-- Configurar Google Sheets -->
-                <button onclick="openSheetsConfigModal()" title="Configurar Sincronização com Google Sheets" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <!-- Configurar Google Sheets do Cliente Atual -->
+                <button onclick="openSheetsConfigModal()" title="Configurar Planilha deste Cliente" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="sheet" class="w-3.5 h-3.5"></i> Google Sheets
                 </button>
 
-                <!-- Botão Adicionar Cliente (Topo) -->
+                <!-- Botão Adicionar Cliente -->
                 <button onclick="openNewClientModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> + Cliente
                 </button>
 
-                <!-- Botão Excluir Cliente (Aparece apenas quando um cliente específico está selecionado) -->
-                <button id="deleteClientHeaderBtn" onclick="deleteClientPrompt()" title="Excluir cliente e todos os seus dados" class="hidden bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <!-- Botão Excluir Cliente Atual -->
+                <button id="deleteClientHeaderBtn" onclick="deleteClientPrompt()" title="Excluir cliente e todos os seus dados" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     <span id="deleteBtnText">Excluir Cliente</span>
                 </button>
@@ -62,26 +66,26 @@
     <!-- Conteúdo Principal -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-        <!-- Abas dos Clientes -->
+        <!-- Abas dos Clientes (Sem a opção 'Todos os Clientes') -->
         <div class="border-b border-slate-200 flex items-center justify-between overflow-x-auto pb-2">
             <div class="flex gap-2" id="clientTabs"></div>
         </div>
 
-        <!-- Seção: Plano de Ações de Implantação 2.0 -->
+        <!-- Seção: Plano de Ações de Implantação 2.0 (Com Minimizar/Expandir) -->
         <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
                 <div>
                     <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
                         <i data-lucide="flag" class="w-5 h-5 text-purple-600"></i>
                         Ações de Implantação da Versão 2.0
-                        <span id="actionClientTitle" class="text-purple-600 font-extrabold">(Todos os Clientes)</span>
+                        <span id="actionClientTitle" class="text-purple-600 font-extrabold"></span>
                     </h2>
                     <p class="text-xs text-slate-500 mt-0.5">Etapas e progresso da migração para o Vidya Force 2.0</p>
                 </div>
                 
-                <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
                     <!-- Barra de Progresso -->
-                    <div class="w-48 bg-slate-100 p-2.5 rounded-xl border border-slate-200 shrink-0">
+                    <div class="w-44 bg-slate-100 p-2 rounded-xl border border-slate-200 shrink-0">
                         <div class="flex justify-between items-center mb-1 text-xs font-semibold">
                             <span class="text-slate-600">Progresso</span>
                             <span id="actionsProgressPercent" class="text-purple-700 font-bold">0%</span>
@@ -91,15 +95,20 @@
                         </div>
                     </div>
 
-                    <!-- Botão Nova Ação (Nesta Seção) -->
+                    <!-- Botão Nova Ação -->
                     <button onclick="openActionModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm shrink-0">
                         <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Nova Ação
+                    </button>
+
+                    <!-- Botão Minimizar/Expandir Ações -->
+                    <button onclick="toggleActionsSection()" id="toggleActionsBtn" title="Minimizar / Expandir Ações" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-lg transition flex items-center justify-center border border-slate-200 shrink-0">
+                        <i id="toggleActionsIcon" data-lucide="chevron-up" class="w-4 h-4"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Lista de Ações -->
-            <div id="actionsContainer" class="space-y-2"></div>
+            <!-- Lista de Ações (Retrátil) -->
+            <div id="actionsContainer" class="space-y-2 mt-4 transition-all duration-300"></div>
         </section>
 
         <!-- Métricas Rápidas dos Tickets -->
@@ -126,7 +135,7 @@
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center">
             <div class="relative w-full md:w-80">
                 <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="searchInput" oninput="render()" placeholder="Buscar por título, cliente ou descrição..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                <input type="text" id="searchInput" oninput="render()" placeholder="Buscar por título ou descrição..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
             </div>
             
             <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
@@ -141,7 +150,7 @@
                     </select>
                 </div>
 
-                <!-- Botão Novo Ticket (Nesta Seção) -->
+                <!-- Botão Novo Ticket -->
                 <button onclick="openTicketModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm shrink-0">
                     <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Novo Ticket
                 </button>
@@ -175,7 +184,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
-        Gestão de tickets Vidya Force 2.0 &bull; Painel de Acompanhamento com Integração Google Sheets
+        Gestão de tickets Vidya Force 2.0 &bull; Painel de Acompanhamento Isolado por Cliente
     </footer>
 
     <!-- Modal: Adicionar Novo Cliente -->
@@ -217,13 +226,13 @@
         </div>
     </div>
 
-    <!-- Modal: Configuração Google Sheets -->
+    <!-- Modal: Configuração Google Sheets do Cliente Ativo -->
     <div id="sheetsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <i data-lucide="sheet" class="w-5 h-5 text-emerald-600"></i>
-                    Sincronização com Google Sheets
+                    Sincronização Google Sheets: <span id="modalClientSheetName" class="text-purple-600"></span>
                 </h3>
                 <button onclick="closeSheetsConfigModal()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -231,16 +240,18 @@
             </div>
             <form onsubmit="saveSheetsUrl(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">URL do Web App (Google Apps Script) *</label>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">URL do Web App (Google Apps Script deste Cliente) *</label>
                     <input type="url" id="sheetsUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    <p class="text-[11px] text-slate-500 mt-1">Cole a URL de implantação gerada pelo seu Apps Script no Google Sheets.</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Cole a URL do Apps Script referente à planilha EXCLUSIVA deste cliente.</p>
                 </div>
-                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 space-y-1">
-                    <p class="font-bold text-slate-800">Como funciona?</p>
-                    <p>Sempre que você criar, editar ou alterar o status de qualquer cliente, ticket ou ação de implantação, a plataforma enviará os dados diretamente para a sua planilha do Google Sheets em tempo real em segundo plano.</p>
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
+                    <p class="font-bold flex items-center gap-1">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i> Segurança e Isolamento:
+                    </p>
+                    <p class="text-slate-600">Esta URL receberá <strong>apenas</strong> as ações e tickets do cliente selecionado (<span id="modalClientSheetNameSub" class="font-bold"></span>), garantindo que os dados não vazem para planilhas de outros clientes.</p>
                 </div>
                 <div class="flex justify-between items-center pt-2">
-                    <button type="button" onclick="testSheetsConnection()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium border border-slate-300">Testar Sincronização</button>
+                    <button type="button" onclick="testSheetsConnection()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium border border-slate-300">Testar Conexão</button>
                     <div class="flex gap-2">
                         <button type="button" onclick="closeSheetsConfigModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
                         <button type="submit" class="px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm">Salvar e Conectar</button>
@@ -359,10 +370,10 @@
 
     <!-- JavaScript da Aplicação -->
     <script>
-        const STORAGE_KEY_CLIENTS = "vidya_clients_v2";
-        const STORAGE_KEY_TICKETS = "vidya_tickets_v2";
-        const STORAGE_KEY_ACTIONS = "vidya_actions_v2";
-        const STORAGE_KEY_SHEETS_URL = "vidya_sheets_url_v2";
+        const STORAGE_KEY_CLIENTS = "vidya_clients_v3";
+        const STORAGE_KEY_TICKETS = "vidya_tickets_v3";
+        const STORAGE_KEY_ACTIONS = "vidya_actions_v3";
+        const STORAGE_KEY_SHEETS_MAP = "vidya_sheets_map_v3";
 
         const DEFAULT_ACTION_TITLES = [
             "Configuração de ambiente",
@@ -401,11 +412,15 @@
         let clients = [];
         let tickets = [];
         let actions = [];
-        let googleSheetsUrl = "";
-        let currentClientFilter = "TODOS";
+        let sheetsUrlMap = {}; // Estrutura: { "Unidas": "https://script.google...", "Social": "https://..." }
+        let currentClientFilter = "Unidas";
+        let isActionsSectionOpen = true;
 
         document.addEventListener("DOMContentLoaded", () => {
             loadStoredData();
+            if (clients.length > 0 && !clients.includes(currentClientFilter)) {
+                currentClientFilter = clients[0];
+            }
             renderTabs();
             populateClientDropdowns();
             render();
@@ -417,17 +432,19 @@
                 const storedClients = localStorage.getItem(STORAGE_KEY_CLIENTS);
                 const storedTickets = localStorage.getItem(STORAGE_KEY_TICKETS);
                 const storedActions = localStorage.getItem(STORAGE_KEY_ACTIONS);
-                googleSheetsUrl = localStorage.getItem(STORAGE_KEY_SHEETS_URL) || "";
+                const storedSheetsMap = localStorage.getItem(STORAGE_KEY_SHEETS_MAP);
 
                 clients = storedClients ? JSON.parse(storedClients) : defaultClients;
                 tickets = storedTickets ? JSON.parse(storedTickets) : defaultTickets;
                 actions = storedActions ? JSON.parse(storedActions) : defaultActions;
+                sheetsUrlMap = storedSheetsMap ? JSON.parse(storedSheetsMap) : {};
 
                 if (!storedClients) saveAllData();
             } catch (e) {
                 clients = defaultClients;
                 tickets = defaultTickets;
                 actions = defaultActions;
+                sheetsUrlMap = {};
             }
         }
 
@@ -436,37 +453,47 @@
                 localStorage.setItem(STORAGE_KEY_CLIENTS, JSON.stringify(clients));
                 localStorage.setItem(STORAGE_KEY_TICKETS, JSON.stringify(tickets));
                 localStorage.setItem(STORAGE_KEY_ACTIONS, JSON.stringify(actions));
+                localStorage.setItem(STORAGE_KEY_SHEETS_MAP, JSON.stringify(sheetsUrlMap));
                 
-                // Dispara a sincronização automática no Google Sheets
-                syncWithGoogleSheets();
+                // Dispara a sincronização isolada apenas para o cliente atual
+                syncWithGoogleSheets(currentClientFilter);
             } catch (e) {
                 console.error("Erro ao salvar dados localmente:", e);
             }
         }
 
-        // SINCRONIZAÇÃO EM TEMPO REAL COM O GOOGLE SHEETS
-        function syncWithGoogleSheets() {
-            if (!googleSheetsUrl) return;
+        // SINCRONIZAÇÃO ISOLADA POR CLIENTE NO GOOGLE SHEETS
+        function syncWithGoogleSheets(clientName) {
+            if (!clientName) return;
+            const clientSheetsUrl = sheetsUrlMap[clientName];
+            if (!clientSheetsUrl) return;
+
+            // Filtra os dados EXCLUSIVAMENTE deste cliente
+            const clientTickets = tickets.filter(t => t.client === clientName);
+            const clientActions = actions.filter(a => a.client === clientName);
 
             const payload = {
-                tickets: tickets,
-                actions: actions
+                client: clientName,
+                tickets: clientTickets,
+                actions: clientActions
             };
 
-            fetch(googleSheetsUrl, {
+            fetch(clientSheetsUrl, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             }).then(() => {
-                console.log("Dados sincronizados com o Google Sheets com sucesso!");
+                console.log(`Dados do cliente "${clientName}" sincronizados na planilha individual!`);
             }).catch(err => {
-                console.error("Falha ao sincronizar com Google Sheets:", err);
+                console.error(`Falha ao sincronizar cliente "${clientName}":`, err);
             });
         }
 
         function openSheetsConfigModal() {
-            document.getElementById("sheetsUrlInput").value = googleSheetsUrl;
+            document.getElementById("modalClientSheetName").innerText = currentClientFilter;
+            document.getElementById("modalClientSheetNameSub").innerText = currentClientFilter;
+            document.getElementById("sheetsUrlInput").value = sheetsUrlMap[currentClientFilter] || "";
             document.getElementById("sheetsModal").classList.remove("hidden");
         }
 
@@ -476,12 +503,17 @@
 
         function saveSheetsUrl(e) {
             e.preventDefault();
-            googleSheetsUrl = document.getElementById("sheetsUrlInput").value.trim();
-            localStorage.setItem(STORAGE_KEY_SHEETS_URL, googleSheetsUrl);
+            const url = document.getElementById("sheetsUrlInput").value.trim();
+            if (url) {
+                sheetsUrlMap[currentClientFilter] = url;
+            } else {
+                delete sheetsUrlMap[currentClientFilter];
+            }
+            
+            saveAllData();
             updateSheetsBadge();
             closeSheetsConfigModal();
-            syncWithGoogleSheets();
-            alert("URL do Google Sheets configurada com sucesso! A primeira sincronização foi enviada.");
+            alert(`Planilha do cliente "${currentClientFilter}" atualizada e sincronizada com sucesso!`);
         }
 
         function testSheetsConnection() {
@@ -490,27 +522,52 @@
                 alert("Por favor, cole a URL do Web App primeiro.");
                 return;
             }
+            const clientTickets = tickets.filter(t => t.client === currentClientFilter);
+            const clientActions = actions.filter(a => a.client === currentClientFilter);
+
             fetch(tempUrl, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tickets: tickets, actions: actions })
+                body: JSON.stringify({ client: currentClientFilter, tickets: clientTickets, actions: clientActions })
             }).then(() => {
-                alert("Sincronização de teste enviada com sucesso ao Google Sheets!");
+                alert(`Teste de envio para "${currentClientFilter}" concluído com sucesso!`);
             }).catch(err => {
-                alert("Erro ao enviar dados de teste: " + err);
+                alert("Erro ao testar envio: " + err);
             });
         }
 
         function updateSheetsBadge() {
-            const badge = document.getElementById("sheetsSyncBadge");
-            if (googleSheetsUrl) {
-                badge.classList.remove("hidden");
-                badge.classList.add("flex");
+            const badgeConnected = document.getElementById("sheetsSyncBadge");
+            const badgeDisconnected = document.getElementById("sheetsNotSyncBadge");
+            const hasUrl = !!sheetsUrlMap[currentClientFilter];
+
+            if (hasUrl) {
+                badgeConnected.classList.remove("hidden");
+                badgeConnected.classList.add("flex");
+                badgeDisconnected.classList.add("hidden");
+                badgeDisconnected.classList.remove("flex");
             } else {
-                badge.classList.add("hidden");
-                badge.classList.remove("flex");
+                badgeDisconnected.classList.remove("hidden");
+                badgeDisconnected.classList.add("flex");
+                badgeConnected.classList.add("hidden");
+                badgeConnected.classList.remove("flex");
             }
+        }
+
+        function toggleActionsSection() {
+            isActionsSectionOpen = !isActionsSectionOpen;
+            const container = document.getElementById("actionsContainer");
+            const icon = document.getElementById("toggleActionsIcon");
+
+            if (isActionsSectionOpen) {
+                container.classList.remove("hidden");
+                icon.setAttribute("data-lucide", "chevron-up");
+            } else {
+                container.classList.add("hidden");
+                icon.setAttribute("data-lucide", "chevron-down");
+            }
+            lucide.createIcons();
         }
 
         function openNewClientModal() {
@@ -539,49 +596,42 @@
 
             saveAllData();
             closeNewClientModal();
-            renderTabs();
             populateClientDropdowns();
             filterByClient(clientNameInput);
         }
 
         function deleteClientPrompt() {
-            if (currentClientFilter === "TODOS") return;
-
             const clientToDelete = currentClientFilter;
-            const confirmMessage = `⚠️ ATENÇÃO: EXCLUSÃO COMPLETA\n\nVocê tem certeza que deseja EXCLUIR PERMANENTEMENTE o cliente "${clientToDelete}"?\n\nEsta ação apagará:\n• O cadastro do cliente "${clientToDelete}"\n• Todos os TICKETS vinculados\n• Todas as AÇÕES DE IMPLANTAÇÃO vinculadas\n\nEsta ação não poderá ser desfeita. Confirmar?`;
+            const confirmMessage = `⚠️ ATENÇÃO: EXCLUSÃO COMPLETA\n\nVocê tem certeza que deseja EXCLUIR PERMANENTEMENTE o cliente "${clientToDelete}"?\n\nEsta ação apagará:\n• O cadastro de "${clientToDelete}"\n• Todos os TICKETS vinculados\n• Todas as AÇÕES DE IMPLANTAÇÃO vinculadas\n• O vínculo do Google Sheets\n\nConfirmar exclusão?`;
 
             if (confirm(confirmMessage)) {
                 clients = clients.filter(c => c !== clientToDelete);
                 tickets = tickets.filter(t => t.client !== clientToDelete);
                 actions = actions.filter(a => a.client !== clientToDelete);
+                delete sheetsUrlMap[clientToDelete];
 
+                if (clients.length === 0) {
+                    clients = ["Unidas"];
+                    actions = generateDefaultActionsForClient("Unidas");
+                }
+
+                currentClientFilter = clients[0];
                 saveAllData();
-                currentClientFilter = "TODOS";
                 renderTabs();
                 populateClientDropdowns();
                 render();
 
-                alert(`O cliente "${clientToDelete}" e todo o seu histórico foram excluídos com sucesso.`);
+                alert(`O cliente "${clientToDelete}" foi excluído com sucesso.`);
             }
         }
 
         function renderTabs() {
             const tabsContainer = document.getElementById("clientTabs");
-            const deleteHeaderBtn = document.getElementById("deleteClientHeaderBtn");
             const deleteBtnText = document.getElementById("deleteBtnText");
 
-            if (currentClientFilter === "TODOS") {
-                deleteHeaderBtn.classList.add("hidden");
-            } else {
-                deleteHeaderBtn.classList.remove("hidden");
-                deleteBtnText.innerText = `Excluir ${currentClientFilter}`;
-            }
+            deleteBtnText.innerText = `Excluir ${currentClientFilter}`;
 
-            let html = `
-                <button onclick="filterByClient('TODOS')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${currentClientFilter === 'TODOS' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
-                    Todos os Clientes
-                </button>
-            `;
+            let html = "";
             clients.forEach(c => {
                 const isActive = currentClientFilter === c;
                 html += `
@@ -597,6 +647,7 @@
             currentClientFilter = client;
             renderTabs();
             render();
+            updateSheetsBadge();
         }
 
         function populateClientDropdowns() {
@@ -617,9 +668,9 @@
             const titleEl = document.getElementById("actionClientTitle");
             const container = document.getElementById("actionsContainer");
 
-            titleEl.innerText = currentClientFilter === "TODOS" ? "(Todos os Clientes)" : `- ${currentClientFilter}`;
+            titleEl.innerText = `- ${currentClientFilter}`;
 
-            const filteredActions = currentClientFilter === "TODOS" ? actions : actions.filter(a => a.client === currentClientFilter);
+            const filteredActions = actions.filter(a => a.client === currentClientFilter);
 
             const doneCount = filteredActions.filter(a => a.status === "Concluído").length;
             const totalCount = filteredActions.length;
@@ -631,7 +682,7 @@
             if (filteredActions.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-6 text-slate-400 text-xs">
-                        Nenhuma ação de implantação cadastrada para ${currentClientFilter === 'TODOS' ? 'os clientes' : currentClientFilter}.
+                        Nenhuma ação de implantação cadastrada para ${currentClientFilter}.
                     </div>
                 `;
                 return;
@@ -693,10 +744,9 @@
             const status = document.getElementById("statusFilter").value;
 
             return tickets.filter(t => {
-                const matchClient = currentClientFilter === "TODOS" || t.client === currentClientFilter;
+                const matchClient = t.client === currentClientFilter;
                 const matchStatus = status === "TODOS" || t.status === status;
                 const matchSearch = t.title.toLowerCase().includes(search) || 
-                                    t.client.toLowerCase().includes(search) || 
                                     (t.description && t.description.toLowerCase().includes(search));
                 return matchClient && matchStatus && matchSearch;
             });
@@ -784,7 +834,7 @@
                 document.getElementById("modalTitle").innerText = "Novo Ticket";
                 document.getElementById("ticketForm").reset();
                 document.getElementById("ticketId").value = "";
-                if (currentClientFilter !== "TODOS") document.getElementById("formClient").value = currentClientFilter;
+                document.getElementById("formClient").value = currentClientFilter;
             }
         }
 
@@ -845,7 +895,7 @@
                 document.getElementById("actionModalTitle").innerText = "Nova Ação de Implantação";
                 document.getElementById("actionForm").reset();
                 document.getElementById("actionId").value = "";
-                if (currentClientFilter !== "TODOS") document.getElementById("actionFormClient").value = currentClientFilter;
+                document.getElementById("actionFormClient").value = currentClientFilter;
             }
         }
 
@@ -911,8 +961,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            const clientName = currentClientFilter === "TODOS" ? "todos_clientes" : currentClientFilter.toLowerCase();
-            a.download = `vidyaforce_tickets_${clientName}_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.download = `vidyaforce_tickets_${currentClientFilter.toLowerCase()}_${new Date().toISOString().slice(0, 10)}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
