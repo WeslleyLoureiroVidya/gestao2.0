@@ -12,6 +12,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Ícones Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Firebase SDKs (Compat v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
@@ -24,22 +28,18 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-wide">Gestão de tickets Vidya Force 2.0</h1>
-                    <p class="text-xs text-slate-400">Acompanhamento e Implantação por Cliente</p>
+                    <p class="text-xs text-slate-400">Acompanhamento por Cliente & Equipe</p>
                 </div>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-                <!-- Status da Sincronização Google Sheets por Cliente -->
-                <div id="sheetsSyncBadge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <!-- Status Firebase Sync -->
+                <div id="firebaseSyncBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Sheets Vinculado
-                </div>
-                <div id="sheetsNotSyncBadge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                    Sheets Não Vinculado
+                    Nuvem Conectada
                 </div>
 
-                <!-- Configurar Google Sheets do Cliente Atual -->
+                <!-- Google Sheets -->
                 <button onclick="openSheetsConfigModal()" title="Configurar Planilha deste Cliente" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="sheet" class="w-3.5 h-3.5"></i> Google Sheets
                 </button>
@@ -66,12 +66,26 @@
     <!-- Conteúdo Principal -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-        <!-- Abas dos Clientes (Sem a opção 'Todos os Clientes') -->
-        <div class="border-b border-slate-200 flex items-center justify-between overflow-x-auto pb-2">
-            <div class="flex gap-2" id="clientTabs"></div>
+        <!-- Barra de Abas de Clientes + Filtro por Membro da Equipe -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Abas dos Clientes -->
+            <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0" id="clientTabs"></div>
+
+            <!-- Filtro por Membro da Equipe (Weslley, Lívia, Jéssica) -->
+            <div class="flex items-center gap-2 shrink-0 w-full md:w-auto justify-end">
+                <span class="text-xs text-slate-500 font-semibold flex items-center gap-1">
+                    <i data-lucide="users" class="w-4 h-4 text-purple-600"></i> Responsável:
+                </span>
+                <select id="teamMemberFilter" onchange="changeTeamMemberFilter(this.value)" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5 bg-white font-medium text-slate-700 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <option value="TODOS">Toda a Equipe</option>
+                    <option value="Weslley">Weslley</option>
+                    <option value="Lívia">Lívia</option>
+                    <option value="Jéssica">Jéssica</option>
+                </select>
+            </div>
         </div>
 
-        <!-- Seção: Plano de Ações de Implantação 2.0 (Com Minimizar/Expandir) -->
+        <!-- Seção: Plano de Ações de Implantação 2.0 -->
         <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
                 <div>
@@ -165,6 +179,7 @@
                         <tr class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
                             <th class="p-4">Cliente</th>
                             <th class="p-4">Título & Descrição</th>
+                            <th class="p-4">Responsável</th>
                             <th class="p-4">Link</th>
                             <th class="p-4">Data Prevista</th>
                             <th class="p-4">Status</th>
@@ -184,7 +199,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
-        Gestão de tickets Vidya Force 2.0 &bull; Painel de Acompanhamento Isolado por Cliente
+        Gestão de tickets Vidya Force 2.0 &bull; Painel Colaborativo em Nuvem
     </footer>
 
     <!-- Modal: Adicionar Novo Cliente -->
@@ -203,20 +218,6 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nome do Cliente / Empresa *</label>
                     <input type="text" id="newClientNameInput" required placeholder="Ex: Renner" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                </div>
-                <div class="p-3 bg-purple-50 border border-purple-100 rounded-xl text-xs text-purple-800 space-y-1">
-                    <p class="font-bold flex items-center gap-1">
-                        <i data-lucide="info" class="w-3.5 h-3.5"></i> Ações Criadas Automaticamente:
-                    </p>
-                    <ul class="list-disc list-inside text-slate-600 space-y-0.5 pl-1">
-                        <li>Configuração de ambiente</li>
-                        <li>Testes internos</li>
-                        <li>Disponibilização parcial</li>
-                        <li>Ajustes e correções</li>
-                        <li>Disponibilização total</li>
-                        <li>Acompanhamento</li>
-                        <li>Handoff</li>
-                    </ul>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeNewClientModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
@@ -242,20 +243,10 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">URL do Web App (Google Apps Script deste Cliente) *</label>
                     <input type="url" id="sheetsUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-                    <p class="text-[11px] text-slate-500 mt-1">Cole a URL do Apps Script referente à planilha EXCLUSIVA deste cliente.</p>
                 </div>
-                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 space-y-1">
-                    <p class="font-bold flex items-center gap-1">
-                        <i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i> Segurança e Isolamento:
-                    </p>
-                    <p class="text-slate-600">Esta URL receberá <strong>apenas</strong> as ações e tickets do cliente selecionado (<span id="modalClientSheetNameSub" class="font-bold"></span>), garantindo que os dados não vazem para planilhas de outros clientes.</p>
-                </div>
-                <div class="flex justify-between items-center pt-2">
-                    <button type="button" onclick="testSheetsConnection()" class="px-3 py-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium border border-slate-300">Testar Conexão</button>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="closeSheetsConfigModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
-                        <button type="submit" class="px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm">Salvar e Conectar</button>
-                    </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeSheetsConfigModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium shadow-sm">Salvar</button>
                 </div>
             </form>
         </div>
@@ -278,6 +269,20 @@
                         <select id="formClient" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></select>
                     </div>
                     <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável *</label>
+                        <select id="formOwner" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <option value="Weslley">Weslley</option>
+                            <option value="Lívia">Lívia</option>
+                            <option value="Jéssica">Jéssica</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Título do Ticket *</label>
+                        <input type="text" id="formTitle" required placeholder="Ex: Validação das chaves da API" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    </div>
+                    <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Status *</label>
                         <select id="formStatus" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
                             <option value="Aberto">Aberto</option>
@@ -286,10 +291,6 @@
                             <option value="Concluído">Concluído</option>
                         </select>
                     </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Título do Ticket *</label>
-                    <input type="text" id="formTitle" required placeholder="Ex: Validação das chaves da API" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -344,12 +345,16 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Título da Ação *</label>
-                    <input type="text" id="actionFormTitle" required placeholder="Ex: Homologação do Player em Sandbox" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="text" id="actionFormTitle" required placeholder="Ex: Homologação do Player" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável</label>
-                        <input type="text" id="actionFormOwner" placeholder="Ex: Carlos / Vidya" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável *</label>
+                        <select id="actionFormOwner" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="Weslley">Weslley</option>
+                            <option value="Lívia">Lívia</option>
+                            <option value="Jéssica">Jéssica</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Data Limite</label>
@@ -368,12 +373,22 @@
         </div>
     </div>
 
-    <!-- JavaScript da Aplicação -->
+    <!-- Script da Aplicação com Firebase Realtime Database -->
     <script>
-        const STORAGE_KEY_CLIENTS = "vidya_clients_v3";
-        const STORAGE_KEY_TICKETS = "vidya_tickets_v3";
-        const STORAGE_KEY_ACTIONS = "vidya_actions_v3";
-        const STORAGE_KEY_SHEETS_MAP = "vidya_sheets_map_v3";
+        // CONFIGURAÇÃO DO FIREBASE (Projeto implantacaovidya2)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCd9s0Cm9GQfZwe9YL65_0xkODf434V6Bw",
+            authDomain: "implantacaovidya2.firebaseapp.com",
+            databaseURL: "https://implantacaovidya2-default-rtdb.firebaseio.com",
+            projectId: "implantacaovidya2",
+            storageBucket: "implantacaovidya2.firebasestorage.app",
+            messagingSenderId: "933629080639",
+            appId: "1:933629080639:web:4ce6cd3518ab67dadcf48a",
+            measurementId: "G-4X6JJEXHWL"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         const DEFAULT_ACTION_TITLES = [
             "Configuração de ambiente",
@@ -385,277 +400,159 @@
             "Handoff"
         ];
 
-        const defaultClients = ["Unidas", "Social"];
+        let clients = ["Unidas", "Social"];
+        let tickets = [];
+        let actions = [];
+        let sheetsUrlMap = {};
         
-        function generateDefaultActionsForClient(clientName) {
+        let currentClientFilter = "Unidas";
+        let currentTeamMemberFilter = "TODOS"; // "TODOS", "Weslley", "Lívia", "Jéssica"
+        let isActionsSectionOpen = true;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initFirebaseListeners();
+        });
+
+        // Escuta em tempo real as mudanças no banco de dados
+        function initFirebaseListeners() {
+            db.ref("vidya_data").on("value", (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    clients = data.clients || ["Unidas", "Social"];
+                    tickets = data.tickets || [];
+                    actions = data.actions || [];
+                    sheetsUrlMap = data.sheetsUrlMap || {};
+                } else {
+                    seedInitialData();
+                }
+
+                if (!clients.includes(currentClientFilter) && clients.length > 0) {
+                    currentClientFilter = clients[0];
+                }
+
+                renderTabs();
+                populateClientDropdowns();
+                render();
+            });
+        }
+
+        function seedInitialData() {
+            const initialClients = ["Unidas", "Social"];
+            const initialActions = [
+                ...generateDefaultActionsForClient("Unidas", "Weslley"),
+                ...generateDefaultActionsForClient("Social", "Lívia")
+            ];
+            const initialTickets = [
+                { id: "101", client: "Unidas", owner: "Weslley", title: "Ajuste na API de Integração de Vídeos", link: "https://jira.exemplo.com/browse/VF-101", description: "Envio de callbacks com timeout intermitente.", status: "Em Andamento", dueDate: "2026-10-15", solution: "Time de infraestrutura analisando logs." },
+                { id: "102", client: "Social", owner: "Lívia", title: "Otimização do player em conexões mobile 4G", link: "https://trello.com/c/vf102", description: "Reduzir buffering no carregamento inicial.", status: "Aberto", dueDate: "2026-10-20", solution: "Planejado para o próximo sprint." }
+            ];
+            saveToFirebase(initialClients, initialTickets, initialActions, {});
+        }
+
+        function generateDefaultActionsForClient(clientName, defaultOwner = "Weslley") {
             return DEFAULT_ACTION_TITLES.map((title, idx) => ({
                 id: `act-${clientName.toLowerCase()}-${idx}-${Date.now()}`,
                 client: clientName,
                 title: title,
-                owner: "Equipe Vidya",
+                owner: defaultOwner,
                 status: idx === 0 ? "Em Andamento" : "Pendente",
                 dueDate: "",
                 notes: ""
             }));
         }
 
-        const defaultActions = [
-            ...generateDefaultActionsForClient("Unidas"),
-            ...generateDefaultActionsForClient("Social")
-        ];
-
-        const defaultTickets = [
-            { id: "101", client: "Unidas", title: "Ajuste na API de Integração de Vídeos", link: "https://jira.exemplo.com/browse/VF-101", description: "Envio de callbacks com timeout intermitente.", status: "Em Andamento", dueDate: "2026-10-15", solution: "Time de infraestrutura analisando logs." },
-            { id: "102", client: "Social", title: "Otimização do player em conexões mobile 4G", link: "https://trello.com/c/vf102", description: "Reduzir buffering no carregamento inicial.", status: "Aberto", dueDate: "2026-10-20", solution: "Planejado para o próximo sprint." }
-        ];
-
-        let clients = [];
-        let tickets = [];
-        let actions = [];
-        let sheetsUrlMap = {}; // Estrutura: { "Unidas": "https://script.google...", "Social": "https://..." }
-        let currentClientFilter = "Unidas";
-        let isActionsSectionOpen = true;
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadStoredData();
-            if (clients.length > 0 && !clients.includes(currentClientFilter)) {
-                currentClientFilter = clients[0];
-            }
-            renderTabs();
-            populateClientDropdowns();
-            render();
-            updateSheetsBadge();
-        });
-
-        function loadStoredData() {
-            try {
-                const storedClients = localStorage.getItem(STORAGE_KEY_CLIENTS);
-                const storedTickets = localStorage.getItem(STORAGE_KEY_TICKETS);
-                const storedActions = localStorage.getItem(STORAGE_KEY_ACTIONS);
-                const storedSheetsMap = localStorage.getItem(STORAGE_KEY_SHEETS_MAP);
-
-                clients = storedClients ? JSON.parse(storedClients) : defaultClients;
-                tickets = storedTickets ? JSON.parse(storedTickets) : defaultTickets;
-                actions = storedActions ? JSON.parse(storedActions) : defaultActions;
-                sheetsUrlMap = storedSheetsMap ? JSON.parse(storedSheetsMap) : {};
-
-                if (!storedClients) saveAllData();
-            } catch (e) {
-                clients = defaultClients;
-                tickets = defaultTickets;
-                actions = defaultActions;
-                sheetsUrlMap = {};
-            }
-        }
-
-        function saveAllData() {
-            try {
-                localStorage.setItem(STORAGE_KEY_CLIENTS, JSON.stringify(clients));
-                localStorage.setItem(STORAGE_KEY_TICKETS, JSON.stringify(tickets));
-                localStorage.setItem(STORAGE_KEY_ACTIONS, JSON.stringify(actions));
-                localStorage.setItem(STORAGE_KEY_SHEETS_MAP, JSON.stringify(sheetsUrlMap));
-                
-                // Dispara a sincronização isolada apenas para o cliente atual
+        function saveToFirebase(updatedClients, updatedTickets, updatedActions, updatedSheetsMap) {
+            db.ref("vidya_data").set({
+                clients: updatedClients || clients,
+                tickets: updatedTickets || tickets,
+                actions: updatedActions || actions,
+                sheetsUrlMap: updatedSheetsMap || sheetsUrlMap
+            }).then(() => {
                 syncWithGoogleSheets(currentClientFilter);
-            } catch (e) {
-                console.error("Erro ao salvar dados localmente:", e);
-            }
+            }).catch(err => {
+                console.error("Erro ao salvar no Firebase:", err);
+            });
         }
 
-        // SINCRONIZAÇÃO ISOLADA POR CLIENTE NO GOOGLE SHEETS
         function syncWithGoogleSheets(clientName) {
-            if (!clientName) return;
             const clientSheetsUrl = sheetsUrlMap[clientName];
             if (!clientSheetsUrl) return;
 
-            // Filtra os dados EXCLUSIVAMENTE deste cliente
             const clientTickets = tickets.filter(t => t.client === clientName);
             const clientActions = actions.filter(a => a.client === clientName);
-
-            const payload = {
-                client: clientName,
-                tickets: clientTickets,
-                actions: clientActions
-            };
 
             fetch(clientSheetsUrl, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            }).then(() => {
-                console.log(`Dados do cliente "${clientName}" sincronizados na planilha individual!`);
-            }).catch(err => {
-                console.error(`Falha ao sincronizar cliente "${clientName}":`, err);
-            });
+                body: JSON.stringify({ client: clientName, tickets: clientTickets, actions: clientActions })
+            }).catch(err => console.error("Erro Sheets:", err));
         }
 
-        function openSheetsConfigModal() {
-            document.getElementById("modalClientSheetName").innerText = currentClientFilter;
-            document.getElementById("modalClientSheetNameSub").innerText = currentClientFilter;
-            document.getElementById("sheetsUrlInput").value = sheetsUrlMap[currentClientFilter] || "";
-            document.getElementById("sheetsModal").classList.remove("hidden");
+        // Filtro por Membro da Equipe
+        function changeTeamMemberFilter(member) {
+            currentTeamMemberFilter = member;
+            render();
         }
 
-        function closeSheetsConfigModal() {
-            document.getElementById("sheetsModal").classList.add("hidden");
-        }
-
-        function saveSheetsUrl(e) {
-            e.preventDefault();
-            const url = document.getElementById("sheetsUrlInput").value.trim();
-            if (url) {
-                sheetsUrlMap[currentClientFilter] = url;
-            } else {
-                delete sheetsUrlMap[currentClientFilter];
-            }
-            
-            saveAllData();
-            updateSheetsBadge();
-            closeSheetsConfigModal();
-            alert(`Planilha do cliente "${currentClientFilter}" atualizada e sincronizada com sucesso!`);
-        }
-
-        function testSheetsConnection() {
-            const tempUrl = document.getElementById("sheetsUrlInput").value.trim();
-            if (!tempUrl) {
-                alert("Por favor, cole a URL do Web App primeiro.");
-                return;
-            }
-            const clientTickets = tickets.filter(t => t.client === currentClientFilter);
-            const clientActions = actions.filter(a => a.client === currentClientFilter);
-
-            fetch(tempUrl, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ client: currentClientFilter, tickets: clientTickets, actions: clientActions })
-            }).then(() => {
-                alert(`Teste de envio para "${currentClientFilter}" concluído com sucesso!`);
-            }).catch(err => {
-                alert("Erro ao testar envio: " + err);
-            });
-        }
-
-        function updateSheetsBadge() {
-            const badgeConnected = document.getElementById("sheetsSyncBadge");
-            const badgeDisconnected = document.getElementById("sheetsNotSyncBadge");
-            const hasUrl = !!sheetsUrlMap[currentClientFilter];
-
-            if (hasUrl) {
-                badgeConnected.classList.remove("hidden");
-                badgeConnected.classList.add("flex");
-                badgeDisconnected.classList.add("hidden");
-                badgeDisconnected.classList.remove("flex");
-            } else {
-                badgeDisconnected.classList.remove("hidden");
-                badgeDisconnected.classList.add("flex");
-                badgeConnected.classList.add("hidden");
-                badgeConnected.classList.remove("flex");
-            }
-        }
-
-        function toggleActionsSection() {
-            isActionsSectionOpen = !isActionsSectionOpen;
-            const container = document.getElementById("actionsContainer");
-            const icon = document.getElementById("toggleActionsIcon");
-
-            if (isActionsSectionOpen) {
-                container.classList.remove("hidden");
-                icon.setAttribute("data-lucide", "chevron-up");
-            } else {
-                container.classList.add("hidden");
-                icon.setAttribute("data-lucide", "chevron-down");
-            }
-            lucide.createIcons();
-        }
-
+        // Gestão de Clientes
         function openNewClientModal() {
             document.getElementById("newClientNameInput").value = "";
             document.getElementById("newClientModal").classList.remove("hidden");
         }
-
         function closeNewClientModal() {
             document.getElementById("newClientModal").classList.add("hidden");
         }
-
         function handleNewClientSubmit(e) {
             e.preventDefault();
-            const clientNameInput = document.getElementById("newClientNameInput").value.trim();
-            if (!clientNameInput) return;
-
-            if (clients.some(c => c.toLowerCase() === clientNameInput.toLowerCase())) {
-                alert(`O cliente "${clientNameInput}" já está cadastrado.`);
+            const name = document.getElementById("newClientNameInput").value.trim();
+            if (!name) return;
+            if (clients.some(c => c.toLowerCase() === name.toLowerCase())) {
+                alert("Cliente já cadastrado!");
                 return;
             }
+            clients.push(name);
+            const newActions = generateDefaultActionsForClient(name, "Weslley");
+            actions = [...actions, ...newActions];
 
-            clients.push(clientNameInput);
-
-            const newClientActions = generateDefaultActionsForClient(clientNameInput);
-            actions = [...actions, ...newClientActions];
-
-            saveAllData();
+            saveToFirebase();
             closeNewClientModal();
-            populateClientDropdowns();
-            filterByClient(clientNameInput);
+            filterByClient(name);
         }
 
         function deleteClientPrompt() {
-            const clientToDelete = currentClientFilter;
-            const confirmMessage = `⚠️ ATENÇÃO: EXCLUSÃO COMPLETA\n\nVocê tem certeza que deseja EXCLUIR PERMANENTEMENTE o cliente "${clientToDelete}"?\n\nEsta ação apagará:\n• O cadastro de "${clientToDelete}"\n• Todos os TICKETS vinculados\n• Todas as AÇÕES DE IMPLANTAÇÃO vinculadas\n• O vínculo do Google Sheets\n\nConfirmar exclusão?`;
+            if (confirm(`Deseja excluir permanentemente o cliente "${currentClientFilter}" e todos os seus dados?`)) {
+                clients = clients.filter(c => c !== currentClientFilter);
+                tickets = tickets.filter(t => t.client !== currentClientFilter);
+                actions = actions.filter(a => a.client !== currentClientFilter);
+                delete sheetsUrlMap[currentClientFilter];
 
-            if (confirm(confirmMessage)) {
-                clients = clients.filter(c => c !== clientToDelete);
-                tickets = tickets.filter(t => t.client !== clientToDelete);
-                actions = actions.filter(a => a.client !== clientToDelete);
-                delete sheetsUrlMap[clientToDelete];
-
-                if (clients.length === 0) {
-                    clients = ["Unidas"];
-                    actions = generateDefaultActionsForClient("Unidas");
-                }
-
+                if (clients.length === 0) clients = ["Unidas"];
                 currentClientFilter = clients[0];
-                saveAllData();
-                renderTabs();
-                populateClientDropdowns();
-                render();
-
-                alert(`O cliente "${clientToDelete}" foi excluído com sucesso.`);
+                saveToFirebase();
             }
-        }
-
-        function renderTabs() {
-            const tabsContainer = document.getElementById("clientTabs");
-            const deleteBtnText = document.getElementById("deleteBtnText");
-
-            deleteBtnText.innerText = `Excluir ${currentClientFilter}`;
-
-            let html = "";
-            clients.forEach(c => {
-                const isActive = currentClientFilter === c;
-                html += `
-                    <button onclick="filterByClient('${c}')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${isActive ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
-                        ${c}
-                    </button>
-                `;
-            });
-            tabsContainer.innerHTML = html;
         }
 
         function filterByClient(client) {
             currentClientFilter = client;
             renderTabs();
             render();
-            updateSheetsBadge();
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById("clientTabs");
+            document.getElementById("deleteBtnText").innerText = `Excluir ${currentClientFilter}`;
+            tabsContainer.innerHTML = clients.map(c => `
+                <button onclick="filterByClient('${c}')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${currentClientFilter === c ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
+                    ${c}
+                </button>
+            `).join('');
         }
 
         function populateClientDropdowns() {
-            const ticketSelect = document.getElementById("formClient");
-            const actionSelect = document.getElementById("actionFormClient");
             const options = clients.map(c => `<option value="${c}">${c}</option>`).join('');
-            ticketSelect.innerHTML = options;
-            actionSelect.innerHTML = options;
+            document.getElementById("formClient").innerHTML = options;
+            document.getElementById("actionFormClient").innerHTML = options;
         }
 
         function render() {
@@ -664,13 +561,13 @@
             lucide.createIcons();
         }
 
+        // Renderização das Ações (filtradas por cliente e responsável)
         function renderActionsSection() {
-            const titleEl = document.getElementById("actionClientTitle");
-            const container = document.getElementById("actionsContainer");
-
-            titleEl.innerText = `- ${currentClientFilter}`;
-
-            const filteredActions = actions.filter(a => a.client === currentClientFilter);
+            document.getElementById("actionClientTitle").innerText = `- ${currentClientFilter}`;
+            let filteredActions = actions.filter(a => a.client === currentClientFilter);
+            if (currentTeamMemberFilter !== "TODOS") {
+                filteredActions = filteredActions.filter(a => a.owner === currentTeamMemberFilter);
+            }
 
             const doneCount = filteredActions.filter(a => a.status === "Concluído").length;
             const totalCount = filteredActions.length;
@@ -679,151 +576,97 @@
             document.getElementById("actionsProgressPercent").innerText = `${percent}%`;
             document.getElementById("actionsProgressBar").style.width = `${percent}%`;
 
+            const container = document.getElementById("actionsContainer");
             if (filteredActions.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-6 text-slate-400 text-xs">
-                        Nenhuma ação de implantação cadastrada para ${currentClientFilter}.
-                    </div>
-                `;
+                container.innerHTML = `<div class="text-center py-4 text-slate-400 text-xs">Nenhuma ação encontrada para os filtros selecionados.</div>`;
                 return;
             }
 
-            container.innerHTML = filteredActions.map(a => {
-                const statusColors = {
-                    "Pendente": "bg-slate-100 text-slate-600 border-slate-200",
-                    "Em Andamento": "bg-blue-50 text-blue-700 border-blue-200",
-                    "Concluído": "bg-emerald-50 text-emerald-700 border-emerald-200"
-                };
-
-                const dateText = a.dueDate ? new Date(a.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
-
-                return `
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 hover:bg-slate-100/80 transition">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">${a.client}</span>
-                                <h4 class="font-semibold text-slate-800 text-sm">${a.title}</h4>
-                            </div>
-                            <div class="flex items-center gap-4 text-xs text-slate-500 mt-1 flex-wrap">
-                                ${a.owner ? `<span><strong class="text-slate-600">Resp:</strong> ${a.owner}</span>` : ''}
-                                <span><strong class="text-slate-600">Prazo:</strong> ${dateText}</span>
-                                ${a.notes ? `<span class="italic text-slate-600">"${a.notes}"</span>` : ''}
-                            </div>
+            container.innerHTML = filteredActions.map(a => `
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800">${a.client}</span>
+                            <h4 class="font-semibold text-slate-800 text-sm">${a.title}</h4>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0 w-full md:w-auto justify-between md:justify-end">
-                            <select onchange="updateActionStatus('${a.id}', this.value)" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border ${statusColors[a.status]} focus:outline-none cursor-pointer">
-                                <option value="Pendente" ${a.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                                <option value="Em Andamento" ${a.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
-                                <option value="Concluído" ${a.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
-                            </select>
-                            <div class="flex items-center gap-1">
-                                <button onclick="editAction('${a.id}')" title="Editar Ação" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded">
-                                    <i data-lucide="pencil" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="deleteAction('${a.id}')" title="Excluir Ação" class="p-1.5 text-slate-400 hover:text-red-600 rounded">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
+                        <div class="flex items-center gap-4 text-xs text-slate-500 mt-1 flex-wrap">
+                            <span><strong class="text-slate-600">Resp:</strong> <span class="text-purple-700 font-semibold">${a.owner || 'Não atribuído'}</span></span>
+                            <span><strong class="text-slate-600">Prazo:</strong> ${a.dueDate ? new Date(a.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-'}</span>
+                            ${a.notes ? `<span class="italic text-slate-600">"${a.notes}"</span>` : ''}
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <div class="flex items-center gap-2">
+                        <select onchange="updateActionStatus('${a.id}', this.value)" class="text-xs font-semibold px-2 py-1 rounded border bg-white cursor-pointer">
+                            <option value="Pendente" ${a.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                            <option value="Em Andamento" ${a.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                            <option value="Concluído" ${a.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                        </select>
+                        <button onclick="editAction('${a.id}')" class="p-1 text-slate-400 hover:text-indigo-600"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                        <button onclick="deleteAction('${a.id}')" class="p-1 text-slate-400 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function updateActionStatus(id, newStatus) {
-            const action = actions.find(a => a.id === id);
-            if (action) {
-                action.status = newStatus;
-                saveAllData();
-                render();
-            }
-        }
-
-        function getFilteredTickets() {
+        // Renderização da Tabela de Tickets
+        function renderTicketsTable() {
             const search = document.getElementById("searchInput").value.toLowerCase();
             const status = document.getElementById("statusFilter").value;
 
-            return tickets.filter(t => {
+            let filtered = tickets.filter(t => {
                 const matchClient = t.client === currentClientFilter;
                 const matchStatus = status === "TODOS" || t.status === status;
-                const matchSearch = t.title.toLowerCase().includes(search) || 
-                                    (t.description && t.description.toLowerCase().includes(search));
-                return matchClient && matchStatus && matchSearch;
+                const matchMember = currentTeamMemberFilter === "TODOS" || t.owner === currentTeamMemberFilter;
+                const matchSearch = t.title.toLowerCase().includes(search) || (t.description && t.description.toLowerCase().includes(search));
+                return matchClient && matchStatus && matchMember && matchSearch;
             });
-        }
-
-        function renderTicketsTable() {
-            const filtered = getFilteredTickets();
-            const tbody = document.getElementById("ticketsTableBody");
-            const emptyState = document.getElementById("emptyState");
 
             document.getElementById("statTotal").innerText = filtered.length;
             document.getElementById("statInProgress").innerText = filtered.filter(t => t.status === "Em Andamento").length;
             document.getElementById("statWaiting").innerText = filtered.filter(t => t.status === "Aguardando Cliente").length;
             document.getElementById("statDone").innerText = filtered.filter(t => t.status === "Concluído").length;
 
+            const tbody = document.getElementById("ticketsTableBody");
+            const emptyState = document.getElementById("emptyState");
+
             if (filtered.length === 0) {
                 tbody.innerHTML = "";
                 emptyState.classList.remove("hidden");
                 return;
             }
-
             emptyState.classList.add("hidden");
 
-            tbody.innerHTML = filtered.map(t => {
-                const statusBadges = {
-                    "Aberto": "bg-slate-100 text-slate-700 border-slate-300",
-                    "Em Andamento": "bg-blue-50 text-blue-700 border-blue-200",
-                    "Aguardando Cliente": "bg-amber-50 text-amber-700 border-amber-200",
-                    "Concluído": "bg-emerald-50 text-emerald-700 border-emerald-200"
-                };
-
-                const dateFormatted = t.dueDate ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
-
-                return `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 whitespace-nowrap">
-                            <span class="font-semibold text-purple-900 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100 text-xs">${t.client}</span>
-                        </td>
-                        <td class="p-4">
-                            <div class="font-semibold text-slate-800">${t.title}</div>
-                            ${t.description ? `<div class="text-xs text-slate-500 mt-0.5 line-clamp-2">${t.description}</div>` : ''}
-                        </td>
-                        <td class="p-4 whitespace-nowrap text-xs">
-                            ${t.link ? `<a href="${t.link}" target="_blank" class="text-purple-600 hover:underline flex items-center gap-1"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver Chamado</a>` : '<span class="text-slate-400">-</span>'}
-                        </td>
-                        <td class="p-4 whitespace-nowrap text-xs text-slate-600">${dateFormatted}</td>
-                        <td class="p-4 whitespace-nowrap">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${statusBadges[t.status] || 'bg-slate-100'}">
-                                ${t.status}
-                            </span>
-                        </td>
-                        <td class="p-4 text-xs text-slate-600 max-w-xs">
-                            ${t.solution ? `<div class="bg-slate-50 p-2 rounded border border-slate-200 text-slate-700">${t.solution}</div>` : '<span class="text-slate-400">Pendente</span>'}
-                        </td>
-                        <td class="p-4 text-center whitespace-nowrap">
-                            <div class="flex items-center justify-center gap-2">
-                                <button onclick="editTicket('${t.id}')" title="Editar Ticket" class="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded transition">
-                                    <i data-lucide="pencil" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="deleteTicket('${t.id}')" title="Excluir Ticket" class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = filtered.map(t => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-4 whitespace-nowrap"><span class="font-semibold text-purple-900 bg-purple-50 px-2 py-1 rounded text-xs">${t.client}</span></td>
+                    <td class="p-4">
+                        <div class="font-semibold text-slate-800">${t.title}</div>
+                        ${t.description ? `<div class="text-xs text-slate-500 mt-0.5 line-clamp-2">${t.description}</div>` : ''}
+                    </td>
+                    <td class="p-4 whitespace-nowrap"><span class="text-xs font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded">${t.owner || 'Weslley'}</span></td>
+                    <td class="p-4 whitespace-nowrap text-xs">
+                        ${t.link ? `<a href="${t.link}" target="_blank" class="text-purple-600 hover:underline flex items-center gap-1"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Chamado</a>` : '-'}
+                    </td>
+                    <td class="p-4 whitespace-nowrap text-xs text-slate-600">${t.dueDate ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-'}</td>
+                    <td class="p-4 whitespace-nowrap"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100">${t.status}</span></td>
+                    <td class="p-4 text-xs text-slate-600">${t.solution || '-'}</td>
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <button onclick="editTicket('${t.id}')" class="p-1 text-slate-500 hover:text-purple-600"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                        <button onclick="deleteTicket('${t.id}')" class="p-1 text-slate-500 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
+        // Funções de Modais e Salvamento (Tickets e Ações)
         function openTicketModal(ticket = null) {
             document.getElementById("ticketModal").classList.remove("hidden");
             populateClientDropdowns();
-
             if (ticket) {
                 document.getElementById("modalTitle").innerText = "Editar Ticket";
                 document.getElementById("ticketId").value = ticket.id;
                 document.getElementById("formClient").value = ticket.client;
+                document.getElementById("formOwner").value = ticket.owner || "Weslley";
                 document.getElementById("formTitle").value = ticket.title;
                 document.getElementById("formLink").value = ticket.link || '';
                 document.getElementById("formStatus").value = ticket.status;
@@ -835,17 +678,16 @@
                 document.getElementById("ticketForm").reset();
                 document.getElementById("ticketId").value = "";
                 document.getElementById("formClient").value = currentClientFilter;
+                document.getElementById("formOwner").value = currentTeamMemberFilter !== "TODOS" ? currentTeamMemberFilter : "Weslley";
             }
         }
-
-        function closeTicketModal() {
-            document.getElementById("ticketModal").classList.add("hidden");
-        }
+        function closeTicketModal() { document.getElementById("ticketModal").classList.add("hidden"); }
 
         function saveTicket(e) {
             e.preventDefault();
             const id = document.getElementById("ticketId").value;
             const client = document.getElementById("formClient").value;
+            const owner = document.getElementById("formOwner").value;
             const title = document.getElementById("formTitle").value;
             const link = document.getElementById("formLink").value;
             const status = document.getElementById("formStatus").value;
@@ -854,54 +696,38 @@
             const solution = document.getElementById("formSolution").value;
 
             if (id) {
-                const index = tickets.findIndex(t => t.id === id);
-                if (index !== -1) tickets[index] = { id, client, title, link, status, dueDate, description, solution };
+                const idx = tickets.findIndex(t => t.id === id);
+                if (idx !== -1) tickets[idx] = { id, client, owner, title, link, status, dueDate, description, solution };
             } else {
-                tickets.push({ id: Date.now().toString(), client, title, link, status, dueDate, description, solution });
+                tickets.push({ id: Date.now().toString(), client, owner, title, link, status, dueDate, description, solution });
             }
-
-            saveAllData();
+            saveToFirebase();
             closeTicketModal();
-            render();
         }
-
-        function editTicket(id) {
-            const ticket = tickets.find(t => t.id === id);
-            if (ticket) openTicketModal(ticket);
-        }
-
-        function deleteTicket(id) {
-            if (confirm("Tem certeza que deseja excluir este ticket?")) {
-                tickets = tickets.filter(t => t.id !== id);
-                saveAllData();
-                render();
-            }
-        }
+        function editTicket(id) { const t = tickets.find(x => x.id === id); if (t) openTicketModal(t); }
+        function deleteTicket(id) { if (confirm("Excluir ticket?")) { tickets = tickets.filter(x => x.id !== id); saveToFirebase(); } }
 
         function openActionModal(action = null) {
             document.getElementById("actionModal").classList.remove("hidden");
             populateClientDropdowns();
-
             if (action) {
-                document.getElementById("actionModalTitle").innerText = "Editar Ação de Implantação";
+                document.getElementById("actionModalTitle").innerText = "Editar Ação";
                 document.getElementById("actionId").value = action.id;
                 document.getElementById("actionFormClient").value = action.client;
                 document.getElementById("actionFormTitle").value = action.title;
-                document.getElementById("actionFormOwner").value = action.owner || '';
+                document.getElementById("actionFormOwner").value = action.owner || "Weslley";
                 document.getElementById("actionFormStatus").value = action.status;
                 document.getElementById("actionFormDueDate").value = action.dueDate || '';
                 document.getElementById("actionFormNotes").value = action.notes || '';
             } else {
-                document.getElementById("actionModalTitle").innerText = "Nova Ação de Implantação";
+                document.getElementById("actionModalTitle").innerText = "Nova Ação";
                 document.getElementById("actionForm").reset();
                 document.getElementById("actionId").value = "";
                 document.getElementById("actionFormClient").value = currentClientFilter;
+                document.getElementById("actionFormOwner").value = currentTeamMemberFilter !== "TODOS" ? currentTeamMemberFilter : "Weslley";
             }
         }
-
-        function closeActionModal() {
-            document.getElementById("actionModal").classList.add("hidden");
-        }
+        function closeActionModal() { document.getElementById("actionModal").classList.add("hidden"); }
 
         function saveAction(e) {
             e.preventDefault();
@@ -914,41 +740,64 @@
             const notes = document.getElementById("actionFormNotes").value;
 
             if (id) {
-                const index = actions.findIndex(a => a.id === id);
-                if (index !== -1) actions[index] = { id, client, title, owner, status, dueDate, notes };
+                const idx = actions.findIndex(a => a.id === id);
+                if (idx !== -1) actions[idx] = { id, client, title, owner, status, dueDate, notes };
             } else {
                 actions.push({ id: "act-" + Date.now(), client, title, owner, status, dueDate, notes });
             }
-
-            saveAllData();
+            saveToFirebase();
             closeActionModal();
-            render();
         }
-
-        function editAction(id) {
-            const action = actions.find(a => a.id === id);
-            if (action) openActionModal(action);
+        function updateActionStatus(id, newStatus) {
+            const a = actions.find(x => x.id === id);
+            if (a) { a.status = newStatus; saveToFirebase(); }
         }
+        function editAction(id) { const a = actions.find(x => x.id === id); if (a) openActionModal(a); }
+        function deleteAction(id) { if (confirm("Excluir ação?")) { actions = actions.filter(x => x.id !== id); saveToFirebase(); } }
 
-        function deleteAction(id) {
-            if (confirm("Tem certeza que deseja excluir esta ação de implantação?")) {
-                actions = actions.filter(a => a.id !== id);
-                saveAllData();
-                render();
+        function toggleActionsSection() {
+            isActionsSectionOpen = !isActionsSectionOpen;
+            const container = document.getElementById("actionsContainer");
+            const icon = document.getElementById("toggleActionsIcon");
+            if (isActionsSectionOpen) {
+                container.classList.remove("hidden");
+                icon.setAttribute("data-lucide", "chevron-up");
+            } else {
+                container.classList.add("hidden");
+                icon.setAttribute("data-lucide", "chevron-down");
             }
+            lucide.createIcons();
+        }
+
+        // Configuração Google Sheets
+        function openSheetsConfigModal() {
+            document.getElementById("modalClientSheetName").innerText = currentClientFilter;
+            document.getElementById("sheetsUrlInput").value = sheetsUrlMap[currentClientFilter] || "";
+            document.getElementById("sheetsModal").classList.remove("hidden");
+        }
+        function closeSheetsConfigModal() { document.getElementById("sheetsModal").classList.add("hidden"); }
+        function saveSheetsUrl(e) {
+            e.preventDefault();
+            const url = document.getElementById("sheetsUrlInput").value.trim();
+            if (url) sheetsUrlMap[currentClientFilter] = url;
+            else delete sheetsUrlMap[currentClientFilter];
+            saveToFirebase();
+            closeSheetsConfigModal();
+            alert("Planilha atualizada!");
         }
 
         function exportToCSV() {
-            const ticketsToExport = getFilteredTickets();
+            const ticketsToExport = tickets.filter(t => t.client === currentClientFilter);
             if (ticketsToExport.length === 0) {
                 alert("Nenhum ticket encontrado para exportar.");
                 return;
             }
 
-            const headers = ["Cliente", "Título", "Link do Chamado", "Descrição", "Status", "Data Prevista", "Solução/Observação"];
+            const headers = ["Cliente", "Título", "Responsável", "Link do Chamado", "Descrição", "Status", "Data Prevista", "Solução/Observação"];
             const rows = ticketsToExport.map(t => [
                 `"${t.client}"`,
                 `"${t.title.replace(/"/g, '""')}"`,
+                `"${t.owner || 'Weslley'}"`,
                 `"${(t.link || '').replace(/"/g, '""')}"`,
                 `"${(t.description || '').replace(/"/g, '""')}"`,
                 `"${t.status}"`,
@@ -961,7 +810,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `vidyaforce_tickets_${currentClientFilter.toLowerCase()}_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.download = `vidyaforce_tickets_${currentClient_Filter || currentClientFilter.toLowerCase()}_${new Date().toISOString().slice(0, 10)}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
