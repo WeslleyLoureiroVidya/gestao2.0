@@ -29,13 +29,11 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-                <button onclick="exportBackupJSON()" title="Baixar cópia de segurança de todos os dados" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5">
-                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Backup (.json)
+                <!-- Botão Excluir Cliente/Projeto -->
+                <button onclick="deleteClientPrompt()" title="Excluir cliente e todos os seus dados" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span id="deleteBtnText">Excluir Cliente</span>
                 </button>
-                <label title="Restaurar cópia de segurança" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer">
-                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Restaurar
-                    <input type="file" id="importBackupInput" onchange="importBackupJSON(event)" accept=".json" class="hidden">
-                </label>
                 <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Planilha (.CSV)
                 </button>
@@ -72,7 +70,7 @@
                     <p class="text-xs text-slate-500 mt-0.5">Etapas e progresso da migração para o Vidya Force 2.0</p>
                 </div>
                 
-                <!-- Barra de Progresso Geral ou do Cliente -->
+                <!-- Barra de Progresso -->
                 <div class="w-full md:w-72 bg-slate-100 p-3 rounded-xl border border-slate-200 shrink-0">
                     <div class="flex justify-between items-center mb-1 text-xs font-semibold">
                         <span class="text-slate-600">Progresso Geral</span>
@@ -153,7 +151,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
-        Gestão de tickets Vidya Force 2.0 &bull; Dados salvos automaticamente no navegador
+        Gestão de tickets Vidya Force 2.0 &bull; Painel de Acompanhamento
     </footer>
 
     <!-- Modal de Cadastrar/Editar Ticket -->
@@ -239,12 +237,12 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Título da Ação *</label>
-                    <input type="text" id="actionFormTitle" required placeholder="Ex: Homologação do Player em ambiente Sandbox" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="text" id="actionFormTitle" required placeholder="Ex: Homologação do Player em Sandbox" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável</label>
-                        <input type="text" id="actionFormOwner" placeholder="Ex: João / Equipe Vidya" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <input type="text" id="actionFormOwner" placeholder="Ex: Carlos / Vidya" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Data Limite</label>
@@ -285,7 +283,6 @@
         let actions = [];
         let currentClientFilter = "TODOS";
 
-        // Inicializador principal
         document.addEventListener("DOMContentLoaded", () => {
             loadStoredData();
             renderTabs();
@@ -293,7 +290,6 @@
             render();
         });
 
-        // CARREGA DO LOCALSTORAGE (OU CRIA OS PADRÕES SE FOR A 1ª VEZ)
         function loadStoredData() {
             try {
                 const storedClients = localStorage.getItem(STORAGE_KEY_CLIENTS);
@@ -304,70 +300,76 @@
                 tickets = storedTickets ? JSON.parse(storedTickets) : defaultTickets;
                 actions = storedActions ? JSON.parse(storedActions) : defaultActions;
 
-                // Garante que os dados padrões sejam persistidos de imediato caso não existissem
                 if (!storedClients) saveAllData();
             } catch (e) {
-                console.error("Erro ao carregar dados do LocalStorage:", e);
                 clients = defaultClients;
                 tickets = defaultTickets;
                 actions = defaultActions;
             }
         }
 
-        // SALVA TUDO NO LOCALSTORAGE DA MÁQUINA
         function saveAllData() {
             try {
                 localStorage.setItem(STORAGE_KEY_CLIENTS, JSON.stringify(clients));
                 localStorage.setItem(STORAGE_KEY_TICKETS, JSON.stringify(tickets));
                 localStorage.setItem(STORAGE_KEY_ACTIONS, JSON.stringify(actions));
             } catch (e) {
-                alert("Erro ao salvar dados localmente. Verifique se o seu navegador permite armazenamento local.");
+                alert("Erro ao salvar dados localmente no navegador.");
             }
         }
 
-        // EXPORTAR BACKUP JSON (Para levar para outra máquina)
-        function exportBackupJSON() {
-            const backupData = { clients, tickets, actions, date: new Date().toISOString() };
-            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `vidyaforce_backup_${new Date().toISOString().slice(0, 10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
+        // EXCLUSÃO COMPLETA DE CLIENTE / PROJETO
+        function deleteClientPrompt() {
+            let clientToDelete = currentClientFilter;
 
-        // IMPORTAR BACKUP JSON
-        function importBackupJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.clients && data.tickets && data.actions) {
-                        clients = data.clients;
-                        tickets = data.tickets;
-                        actions = data.actions;
-                        saveAllData();
-                        renderTabs();
-                        populateClientDropdowns();
-                        render();
-                        alert("Backup restaurado com sucesso!");
-                    } else {
-                        alert("Arquivo de backup inválido.");
-                    }
-                } catch (err) {
-                    alert("Erro ao ler o arquivo de backup.");
+            if (clientToDelete === "TODOS") {
+                if (clients.length === 0) {
+                    alert("Não há clientes cadastrados para excluir.");
+                    return;
                 }
-            };
-            reader.readAsText(file);
+                const choice = prompt(`Digite o nome do cliente que deseja EXCLUIR inteiramente:\n\nClientes disponíveis:\n- ${clients.join('\n- ')}`);
+                if (!choice || !choice.trim()) return;
+                clientToDelete = choice.trim();
+
+                const found = clients.find(c => c.toLowerCase() === clientToDelete.toLowerCase());
+                if (!found) {
+                    alert(`Cliente "${clientToDelete}" não foi encontrado.`);
+                    return;
+                }
+                clientToDelete = found;
+            }
+
+            const confirmMessage = `⚠️ ATENÇÃO: EXCLUSÃO DE PROJETO\n\nVocê tem certeza que deseja EXCLUIR o cliente "${clientToDelete}"?\n\nEsta ação apagará PERMANENTEMENTE:\n• O cadastro do cliente "${clientToDelete}"\n• Todos os TICKETS deste cliente\n• Todas as AÇÕES DE IMPLANTAÇÃO deste cliente\n\nEsta ação não poderá ser desfeita. Confirmar?`;
+
+            if (confirm(confirmMessage)) {
+                // Remove o cliente
+                clients = clients.filter(c => c !== clientToDelete);
+                // Remove todos os tickets do cliente
+                tickets = tickets.filter(t => t.client !== clientToDelete);
+                // Remove todas as ações do cliente
+                actions = actions.filter(a => a.client !== clientToDelete);
+
+                saveAllData();
+                currentClientFilter = "TODOS";
+                renderTabs();
+                populateClientDropdowns();
+                render();
+
+                alert(`O cliente "${clientToDelete}" e todo o seu histórico foram excluídos com sucesso.`);
+            }
         }
 
-        // Renderizar Abas de Clientes
         function renderTabs() {
             const tabsContainer = document.getElementById("clientTabs");
+            const deleteBtnText = document.getElementById("deleteBtnText");
+
+            // Atualiza texto do botão de excluir para dar clareza
+            if (currentClientFilter === "TODOS") {
+                deleteBtnText.innerText = "Excluir Cliente";
+            } else {
+                deleteBtnText.innerText = `Excluir ${currentClientFilter}`;
+            }
+
             let html = `
                 <button onclick="filterByClient('TODOS')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${currentClientFilter === 'TODOS' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
                     Todos os Clientes
@@ -418,7 +420,6 @@
             lucide.createIcons();
         }
 
-        // RENDERIZAÇÃO DA SEÇÃO DE AÇÕES DE IMPLANTAÇÃO
         function renderActionsSection() {
             const titleEl = document.getElementById("actionClientTitle");
             const container = document.getElementById("actionsContainer");
@@ -494,7 +495,6 @@
             }
         }
 
-        // RENDERIZAÇÃO DA TABELA DE TICKETS
         function getFilteredTickets() {
             const search = document.getElementById("searchInput").value.toLowerCase();
             const status = document.getElementById("statusFilter").value;
@@ -573,7 +573,6 @@
             }).join('');
         }
 
-        // MODAL TICKET
         function openTicketModal(ticket = null) {
             document.getElementById("ticketModal").classList.remove("hidden");
             populateClientDropdowns();
@@ -636,7 +635,6 @@
             }
         }
 
-        // MODAL AÇÕES
         function openActionModal(action = null) {
             document.getElementById("actionModal").classList.remove("hidden");
             populateClientDropdowns();
@@ -697,7 +695,6 @@
             }
         }
 
-        // EXPORTAR PLANILHA CSV
         function exportToCSV() {
             const ticketsToExport = getFilteredTickets();
             if (ticketsToExport.length === 0) {
