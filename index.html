@@ -10,16 +10,16 @@
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ícones Lucide -->
+    <!-- Ícones Lucide CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Header -->
+    <!-- Header Principal -->
     <header class="bg-slate-900 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-purple-400 text-white font-black rounded-xl flex items-center justify-center text-xl shadow-md">
+                <div class="w-10 h-10 bg-purple-500 text-white font-black rounded-xl flex items-center justify-center text-xl shadow-md">
                     V
                 </div>
                 <div>
@@ -28,20 +28,22 @@
                 </div>
             </div>
             
+            <!-- Botões de Ação do Topo -->
             <div class="flex flex-wrap items-center gap-2">
-                <!-- Botão Excluir Cliente/Projeto -->
-                <button onclick="deleteClientPrompt()" title="Excluir cliente e todos os seus dados" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <!-- 1. Botão + Cliente no Topo -->
+                <button onclick="openNewClientModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> + Cliente
+                </button>
+
+                <!-- 2. Botão Excluir Cliente (Aparece SOMENTE ao selecionar um cliente específico nas abas) -->
+                <button id="deleteClientBtn" onclick="deleteClientPrompt()" title="Excluir cliente e todos os seus dados" class="hidden bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold transition items-center gap-1.5 shadow-sm">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
                     <span id="deleteBtnText">Excluir Cliente</span>
                 </button>
-                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Planilha (.CSV)
-                </button>
-                <button onclick="openActionModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="list-checks" class="w-3.5 h-3.5"></i> Nova Ação
-                </button>
-                <button onclick="openTicketModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
-                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Novo Ticket
+
+                <!-- Exportar CSV -->
+                <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Exportar CSV
                 </button>
             </div>
         </div>
@@ -53,9 +55,6 @@
         <!-- Abas dos Clientes -->
         <div class="border-b border-slate-200 flex items-center justify-between overflow-x-auto pb-2">
             <div class="flex gap-2" id="clientTabs"></div>
-            <button onclick="addNewClientPrompt()" class="text-xs text-purple-600 hover:text-purple-800 font-medium px-2.5 py-1.5 rounded-lg border border-purple-200 hover:bg-purple-50 flex items-center gap-1 shrink-0">
-                <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> + Cliente
-            </button>
         </div>
 
         <!-- Seção: Plano de Ações de Implantação 2.0 -->
@@ -70,15 +69,22 @@
                     <p class="text-xs text-slate-500 mt-0.5">Etapas e progresso da migração para o Vidya Force 2.0</p>
                 </div>
                 
-                <!-- Barra de Progresso -->
-                <div class="w-full md:w-72 bg-slate-100 p-3 rounded-xl border border-slate-200 shrink-0">
-                    <div class="flex justify-between items-center mb-1 text-xs font-semibold">
-                        <span class="text-slate-600">Progresso Geral</span>
-                        <span id="actionsProgressPercent" class="text-purple-700 font-bold">0%</span>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                    <!-- Barra de Progresso -->
+                    <div class="w-full sm:w-56 bg-slate-100 p-2.5 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center mb-1 text-xs font-semibold">
+                            <span class="text-slate-600">Progresso Geral</span>
+                            <span id="actionsProgressPercent" class="text-purple-700 font-bold">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                            <div id="actionsProgressBar" class="bg-purple-600 h-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
                     </div>
-                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                        <div id="actionsProgressBar" class="bg-purple-600 h-full transition-all duration-300" style="width: 0%"></div>
-                    </div>
+
+                    <!-- 3. Botão Nova Ação posicionado na seção de ações -->
+                    <button onclick="openActionModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap">
+                        <i data-lucide="list-checks" class="w-4 h-4"></i> Nova Ação
+                    </button>
                 </div>
             </div>
 
@@ -106,21 +112,29 @@
             </div>
         </div>
 
-        <!-- Busca e Filtros -->
+        <!-- Busca, Filtros e Botão Novo Ticket na Seção de Tickets -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div class="relative w-full md:w-96">
+            <div class="relative w-full md:w-80">
                 <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
                 <input type="text" id="searchInput" oninput="render()" placeholder="Buscar por título, cliente ou descrição..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
             </div>
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <label class="text-xs text-slate-500 font-medium whitespace-nowrap">Status Ticket:</label>
-                <select id="statusFilter" onchange="render()" class="w-full md:w-auto text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                    <option value="TODOS">Todos os Status</option>
-                    <option value="Aberto">Aberto</option>
-                    <option value="Em Andamento">Em Andamento</option>
-                    <option value="Aguardando Cliente">Aguardando Cliente</option>
-                    <option value="Concluído">Concluído</option>
-                </select>
+            
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs text-slate-500 font-medium whitespace-nowrap">Status Ticket:</label>
+                    <select id="statusFilter" onchange="render()" class="text-sm border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="TODOS">Todos os Status</option>
+                        <option value="Aberto">Aberto</option>
+                        <option value="Em Andamento">Em Andamento</option>
+                        <option value="Aguardando Cliente">Aguardando Cliente</option>
+                        <option value="Concluído">Concluído</option>
+                    </select>
+                </div>
+
+                <!-- 4. Botão Novo Ticket posicionado na seção de tickets -->
+                <button onclick="openTicketModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Novo Ticket
+                </button>
             </div>
         </div>
 
@@ -154,7 +168,32 @@
         Gestão de tickets Vidya Force 2.0 &bull; Painel de Acompanhamento
     </footer>
 
-    <!-- Modal de Cadastrar/Editar Ticket -->
+    <!-- Modal: Adicionar Novo Cliente -->
+    <div id="newClientModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="user-plus" class="w-5 h-5 text-purple-600"></i>
+                    Cadastrar Novo Cliente
+                </h3>
+                <button onclick="closeNewClientModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form onsubmit="saveNewClient(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nome do Cliente *</label>
+                    <input type="text" id="newClientInputName" required placeholder="Ex: Empresa XYZ" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                </div>
+                <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeNewClientModal()" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm">Salvar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Cadastrar/Editar Ticket -->
     <div id="ticketModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
@@ -203,14 +242,14 @@
                     <textarea id="formSolution" rows="2" placeholder="Resolução ou status atual..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></textarea>
                 </div>
                 <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeTicketModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-sm">Salvar Ticket</button>
+                    <button type="button" onclick="closeTicketModal()" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-sm">Salvar Ticket</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal de Cadastrar/Editar Ação de Implantação -->
+    <!-- Modal: Cadastrar/Editar Ação de Implantação -->
     <div id="actionModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
@@ -254,14 +293,25 @@
                     <textarea id="actionFormNotes" rows="2" placeholder="Detalhes do andamento..." class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
                 </div>
                 <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-sm">Salvar Ação</button>
+                    <button type="button" onclick="closeActionModal()" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-sm">Salvar Ação</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- JavaScript da Aplicação -->
+    <!-- Modal Customizado de Diálogo / Confirmação -->
+    <div id="customDialogModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex items-center gap-3 mb-3 text-red-600" id="dialogHeaderIcon">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                <h3 id="dialogTitle" class="text-base font-bold text-slate-800">Confirmação</h3>
+            </div>
+            <p id="dialogMessage" class="text-xs text-slate-600 mb-6 leading-relaxed whitespace-pre-line"></p>
+            <div class="flex justify-end gap-2" id="dialogActions"></div>
+        </div>
+    </div>
+
     <script>
         const STORAGE_KEY_CLIENTS = "vidya_clients_v2";
         const STORAGE_KEY_TICKETS = "vidya_tickets_v2";
@@ -314,59 +364,54 @@
                 localStorage.setItem(STORAGE_KEY_TICKETS, JSON.stringify(tickets));
                 localStorage.setItem(STORAGE_KEY_ACTIONS, JSON.stringify(actions));
             } catch (e) {
-                alert("Erro ao salvar dados localmente no navegador.");
+                console.error("Erro ao salvar dados localmente.");
             }
         }
 
-        // EXCLUSÃO COMPLETA DE CLIENTE / PROJETO
-        function deleteClientPrompt() {
-            let clientToDelete = currentClientFilter;
+        function showCustomDialog({ title, message, isConfirm = false, confirmText = "Confirmar", confirmClass = "bg-red-600 hover:bg-red-700", onConfirm }) {
+            const modal = document.getElementById("customDialogModal");
+            const titleEl = document.getElementById("dialogTitle");
+            const msgEl = document.getElementById("dialogMessage");
+            const actionsEl = document.getElementById("dialogActions");
 
-            if (clientToDelete === "TODOS") {
-                if (clients.length === 0) {
-                    alert("Não há clientes cadastrados para excluir.");
-                    return;
-                }
-                const choice = prompt(`Digite o nome do cliente que deseja EXCLUIR inteiramente:\n\nClientes disponíveis:\n- ${clients.join('\n- ')}`);
-                if (!choice || !choice.trim()) return;
-                clientToDelete = choice.trim();
+            titleEl.innerText = title || (isConfirm ? "Confirmação" : "Aviso");
+            msgEl.innerText = message;
 
-                const found = clients.find(c => c.toLowerCase() === clientToDelete.toLowerCase());
-                if (!found) {
-                    alert(`Cliente "${clientToDelete}" não foi encontrado.`);
-                    return;
-                }
-                clientToDelete = found;
+            if (isConfirm) {
+                actionsEl.innerHTML = `
+                    <button onclick="closeCustomDialog()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancelar</button>
+                    <button id="dialogConfirmBtn" class="px-4 py-2 text-xs font-semibold text-white rounded-lg transition shadow-sm ${confirmClass}">${confirmText}</button>
+                `;
+                document.getElementById("dialogConfirmBtn").onclick = () => {
+                    closeCustomDialog();
+                    if (onConfirm) onConfirm();
+                };
+            } else {
+                actionsEl.innerHTML = `
+                    <button onclick="closeCustomDialog()" class="px-4 py-2 text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition shadow-sm">Entendido</button>
+                `;
             }
 
-            const confirmMessage = `⚠️ ATENÇÃO: EXCLUSÃO DE PROJETO\n\nVocê tem certeza que deseja EXCLUIR o cliente "${clientToDelete}"?\n\nEsta ação apagará PERMANENTEMENTE:\n• O cadastro do cliente "${clientToDelete}"\n• Todos os TICKETS deste cliente\n• Todas as AÇÕES DE IMPLANTAÇÃO deste cliente\n\nEsta ação não poderá ser desfeita. Confirmar?`;
+            modal.classList.remove("hidden");
+            lucide.createIcons();
+        }
 
-            if (confirm(confirmMessage)) {
-                // Remove o cliente
-                clients = clients.filter(c => c !== clientToDelete);
-                // Remove todos os tickets do cliente
-                tickets = tickets.filter(t => t.client !== clientToDelete);
-                // Remove todas as ações do cliente
-                actions = actions.filter(a => a.client !== clientToDelete);
-
-                saveAllData();
-                currentClientFilter = "TODOS";
-                renderTabs();
-                populateClientDropdowns();
-                render();
-
-                alert(`O cliente "${clientToDelete}" e todo o seu histórico foram excluídos com sucesso.`);
-            }
+        function closeCustomDialog() {
+            document.getElementById("customDialogModal").classList.add("hidden");
         }
 
         function renderTabs() {
             const tabsContainer = document.getElementById("clientTabs");
+            const deleteClientBtn = document.getElementById("deleteClientBtn");
             const deleteBtnText = document.getElementById("deleteBtnText");
 
-            // Atualiza texto do botão de excluir para dar clareza
+            // O botão Excluir Cliente só aparece se um cliente específico estiver selecionado
             if (currentClientFilter === "TODOS") {
-                deleteBtnText.innerText = "Excluir Cliente";
+                deleteClientBtn.classList.add("hidden");
+                deleteClientBtn.classList.remove("flex");
             } else {
+                deleteClientBtn.classList.remove("hidden");
+                deleteClientBtn.classList.add("flex");
                 deleteBtnText.innerText = `Excluir ${currentClientFilter}`;
             }
 
@@ -392,18 +437,59 @@
             render();
         }
 
-        function addNewClientPrompt() {
-            const newClient = prompt("Digite o nome do novo cliente:");
-            if (newClient && newClient.trim() !== "") {
-                const nameFormatted = newClient.trim();
-                if (!clients.includes(nameFormatted)) {
-                    clients.push(nameFormatted);
+        function openNewClientModal() {
+            document.getElementById("newClientInputName").value = "";
+            document.getElementById("newClientModal").classList.remove("hidden");
+        }
+
+        function closeNewClientModal() {
+            document.getElementById("newClientModal").classList.add("hidden");
+        }
+
+        function saveNewClient(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById("newClientInputName").value.trim();
+            if (!nameInput) return;
+
+            if (clients.some(c => c.toLowerCase() === nameInput.toLowerCase())) {
+                showCustomDialog({
+                    title: "Cliente Existente",
+                    message: `O cliente "${nameInput}" já está cadastrado no sistema.`
+                });
+                return;
+            }
+
+            clients.push(nameInput);
+            saveAllData();
+            renderTabs();
+            populateClientDropdowns();
+            filterByClient(nameInput);
+            closeNewClientModal();
+        }
+
+        function deleteClientPrompt() {
+            if (currentClientFilter === "TODOS") return;
+
+            const clientToDelete = currentClientFilter;
+            const confirmMessage = `Você tem certeza que deseja EXCLUIR o cliente "${clientToDelete}"?\n\nEsta ação excluirá PERMANENTEMENTE:\n• O cadastro do cliente\n• Todos os TICKETS vinculados\n• Todas as AÇÕES DE IMPLANTAÇÃO vinculadas\n\nEssa ação não poderá ser desfeita.`;
+
+            showCustomDialog({
+                title: `Excluir Cliente ${clientToDelete}`,
+                message: confirmMessage,
+                isConfirm: true,
+                confirmText: "Sim, Excluir Projeto Integrado",
+                onConfirm: () => {
+                    clients = clients.filter(c => c !== clientToDelete);
+                    tickets = tickets.filter(t => t.client !== clientToDelete);
+                    actions = actions.filter(a => a.client !== clientToDelete);
+
                     saveAllData();
+                    currentClientFilter = "TODOS";
                     renderTabs();
                     populateClientDropdowns();
-                    filterByClient(nameFormatted);
+                    render();
                 }
-            }
+            });
         }
 
         function populateClientDropdowns() {
@@ -628,11 +714,17 @@
         }
 
         function deleteTicket(id) {
-            if (confirm("Tem certeza que deseja excluir este ticket?")) {
-                tickets = tickets.filter(t => t.id !== id);
-                saveAllData();
-                render();
-            }
+            showCustomDialog({
+                title: "Excluir Ticket",
+                message: "Tem certeza que deseja excluir este ticket?",
+                isConfirm: true,
+                confirmText: "Excluir",
+                onConfirm: () => {
+                    tickets = tickets.filter(t => t.id !== id);
+                    saveAllData();
+                    render();
+                }
+            });
         }
 
         function openActionModal(action = null) {
@@ -688,17 +780,26 @@
         }
 
         function deleteAction(id) {
-            if (confirm("Tem certeza que deseja excluir esta ação de implantação?")) {
-                actions = actions.filter(a => a.id !== id);
-                saveAllData();
-                render();
-            }
+            showCustomDialog({
+                title: "Excluir Ação",
+                message: "Tem certeza que deseja excluir esta ação de implantação?",
+                isConfirm: true,
+                confirmText: "Excluir",
+                onConfirm: () => {
+                    actions = actions.filter(a => a.id !== id);
+                    saveAllData();
+                    render();
+                }
+            });
         }
 
         function exportToCSV() {
             const ticketsToExport = getFilteredTickets();
             if (ticketsToExport.length === 0) {
-                alert("Nenhum ticket encontrado para exportar.");
+                showCustomDialog({
+                    title: "Exportação CSV",
+                    message: "Nenhum ticket encontrado nos filtros atuais para exportar."
+                });
                 return;
             }
 
