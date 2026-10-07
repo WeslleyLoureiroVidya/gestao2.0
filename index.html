@@ -40,7 +40,7 @@
                 </div>
 
                 <!-- Google Sheets -->
-                <button onclick="openSheetsConfigModal()" title="Configurar Planilha deste Cliente" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <button onclick="openSheetsConfigModal()" title="Configurar Planilha deste Projeto" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="sheet" class="w-3.5 h-3.5"></i> Google Sheets
                 </button>
 
@@ -52,7 +52,7 @@
                 <!-- Botão Excluir Cliente Atual -->
                 <button id="deleteClientHeaderBtn" onclick="deleteClientPrompt()" title="Excluir cliente e todos os seus dados" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    <span id="deleteBtnText">Excluir Cliente</span>
+                    <span id="deleteBtnText">Excluir Projeto</span>
                 </button>
 
                 <!-- Exportar CSV -->
@@ -66,9 +66,9 @@
     <!-- Conteúdo Principal -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-        <!-- Barra de Abas de Clientes + Filtro por Membro da Equipe -->
+        <!-- Barra de Abas de Projetos + Filtro por Responsável -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <!-- Abas dos Clientes -->
+            <!-- Abas dos Projetos -->
             <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0" id="clientTabs"></div>
 
             <!-- Filtro por Membro da Equipe (Weslley, Lívia, Jéssica) -->
@@ -77,7 +77,7 @@
                     <i data-lucide="users" class="w-4 h-4 text-purple-600"></i> Responsável:
                 </span>
                 <select id="teamMemberFilter" onchange="changeTeamMemberFilter(this.value)" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5 bg-white font-medium text-slate-700 focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                    <option value="TODOS">Toda a Equipe</option>
+                    <option value="TODOS">Todos os Projetos</option>
                     <option value="Weslley">Weslley</option>
                     <option value="Lívia">Lívia</option>
                     <option value="Jéssica">Jéssica</option>
@@ -177,7 +177,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-100 text-slate-600 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
-                            <th class="p-4">Cliente</th>
+                            <th class="p-4">Projeto</th>
                             <th class="p-4">Título & Descrição</th>
                             <th class="p-4">Responsável</th>
                             <th class="p-4">Link</th>
@@ -208,7 +208,7 @@
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <i data-lucide="user-plus" class="w-5 h-5 text-purple-600"></i>
-                    Cadastrar Novo Cliente
+                    Cadastrar Novo Projeto
                 </h3>
                 <button onclick="closeNewClientModal()" class="text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -216,18 +216,27 @@
             </div>
             <form onsubmit="handleNewClientSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nome do Cliente / Empresa *</label>
-                    <input type="text" id="newClientNameInput" required placeholder="Ex: Renner" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nome do Projeto *</label>
+                    <input type="text" id="newClientNameInput" required placeholder="Ex: Projeto Força 2.0" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável pelo Projeto *</label>
+                    <select id="newProjectOwnerInput" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="">Selecione o responsável</option>
+                        <option value="Weslley">Weslley</option>
+                        <option value="Lívia">Lívia</option>
+                        <option value="Jéssica">Jéssica</option>
+                    </select>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeNewClientModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
-                    <button type="submit" class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-sm">Cadastrar Cliente</button>
+                    <button type="submit" class="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-sm">Cadastrar Projeto</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Configuração Google Sheets do Cliente Ativo -->
+    <!-- Modal: Configuração Google Sheets do Projeto Ativo -->
     <div id="sheetsModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
@@ -265,7 +274,7 @@
                 <input type="hidden" id="ticketId">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Cliente *</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Projeto *</label>
                         <select id="formClient" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none"></select>
                     </div>
                     <div>
@@ -331,7 +340,7 @@
                 <input type="hidden" id="actionId">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Cliente *</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Projeto *</label>
                         <select id="actionFormClient" required class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></select>
                     </div>
                     <div>
@@ -400,12 +409,13 @@
             "Handoff"
         ];
 
-        let clients = ["Unidas", "Social"];
+        let clients = [];
+        let projectOwners = {};
         let tickets = [];
         let actions = [];
         let sheetsUrlMap = {};
-        
-        let currentClientFilter = "Unidas";
+
+        let currentClientFilter = "";
         let currentTeamMemberFilter = "TODOS"; // "TODOS", "Weslley", "Lívia", "Jéssica"
         let isActionsSectionOpen = true;
 
@@ -417,17 +427,32 @@
         function initFirebaseListeners() {
             db.ref("vidya_data").on("value", (snapshot) => {
                 const data = snapshot.val();
+
                 if (data) {
-                    clients = data.clients || ["Unidas", "Social"];
+                    // Limpeza única: remove os projetos/dados antigos existentes no banco.
+                    if (!data.projectMigrationV2) {
+                        clients = [];
+                        projectOwners = {};
+                        tickets = [];
+                        actions = [];
+                        sheetsUrlMap = {};
+                        saveToFirebase(true);
+                        return;
+                    }
+
+                    clients = Array.isArray(data.clients) ? data.clients : [];
+                    projectOwners = data.projectOwners || {};
                     tickets = data.tickets || [];
                     actions = data.actions || [];
                     sheetsUrlMap = data.sheetsUrlMap || {};
                 } else {
                     seedInitialData();
+                    return;
                 }
 
-                if (!clients.includes(currentClientFilter) && clients.length > 0) {
-                    currentClientFilter = clients[0];
+                const visibleProjects = getProjectsForCurrentFilter();
+                if (!visibleProjects.includes(currentClientFilter)) {
+                    currentClientFilter = visibleProjects[0] || "";
                 }
 
                 renderTabs();
@@ -437,16 +462,12 @@
         }
 
         function seedInitialData() {
-            const initialClients = ["Unidas", "Social"];
-            const initialActions = [
-                ...generateDefaultActionsForClient("Unidas", "Weslley"),
-                ...generateDefaultActionsForClient("Social", "Lívia")
-            ];
-            const initialTickets = [
-                { id: "101", client: "Unidas", owner: "Weslley", title: "Ajuste na API de Integração de Vídeos", link: "https://jira.exemplo.com/browse/VF-101", description: "Envio de callbacks com timeout intermitente.", status: "Em Andamento", dueDate: "2026-10-15", solution: "Time de infraestrutura analisando logs." },
-                { id: "102", client: "Social", owner: "Lívia", title: "Otimização do player em conexões mobile 4G", link: "https://trello.com/c/vf102", description: "Reduzir buffering no carregamento inicial.", status: "Aberto", dueDate: "2026-10-20", solution: "Planejado para o próximo sprint." }
-            ];
-            saveToFirebase(initialClients, initialTickets, initialActions, {});
+            clients = [];
+            projectOwners = {};
+            tickets = [];
+            actions = [];
+            sheetsUrlMap = {};
+            saveToFirebase(true);
         }
 
         function generateDefaultActionsForClient(clientName, defaultOwner = "Weslley") {
@@ -461,14 +482,16 @@
             }));
         }
 
-        function saveToFirebase(updatedClients, updatedTickets, updatedActions, updatedSheetsMap) {
+        function saveToFirebase(forceEmpty = false) {
             db.ref("vidya_data").set({
-                clients: updatedClients || clients,
-                tickets: updatedTickets || tickets,
-                actions: updatedActions || actions,
-                sheetsUrlMap: updatedSheetsMap || sheetsUrlMap
+                clients: forceEmpty ? [] : clients,
+                projectOwners: forceEmpty ? {} : projectOwners,
+                tickets: forceEmpty ? [] : tickets,
+                actions: forceEmpty ? [] : actions,
+                sheetsUrlMap: forceEmpty ? {} : sheetsUrlMap,
+                projectMigrationV2: true
             }).then(() => {
-                syncWithGoogleSheets(currentClientFilter);
+                if (currentClientFilter) syncWithGoogleSheets(currentClientFilter);
             }).catch(err => {
                 console.error("Erro ao salvar no Firebase:", err);
             });
@@ -489,15 +512,27 @@
             }).catch(err => console.error("Erro Sheets:", err));
         }
 
-        // Filtro por Membro da Equipe
+        function getProjectsForCurrentFilter() {
+            if (currentTeamMemberFilter === "TODOS") return [...clients];
+            return clients.filter(project => projectOwners[project] === currentTeamMemberFilter);
+        }
+
+        // Filtro por responsável: mostra somente os projetos atribuídos a ele.
         function changeTeamMemberFilter(member) {
             currentTeamMemberFilter = member;
+            const visibleProjects = getProjectsForCurrentFilter();
+            currentClientFilter = visibleProjects[0] || "";
+            renderTabs();
+            populateClientDropdowns();
             render();
         }
 
+        // Gestão de Projetos
         // Gestão de Clientes
         function openNewClientModal() {
             document.getElementById("newClientNameInput").value = "";
+            document.getElementById("newProjectOwnerInput").value =
+                currentTeamMemberFilter !== "TODOS" ? currentTeamMemberFilter : "";
             document.getElementById("newClientModal").classList.remove("hidden");
         }
         function closeNewClientModal() {
@@ -505,35 +540,52 @@
         }
         function handleNewClientSubmit(e) {
             e.preventDefault();
+
             const name = document.getElementById("newClientNameInput").value.trim();
-            if (!name) return;
+            const owner = document.getElementById("newProjectOwnerInput").value;
+
+            if (!name || !owner) return;
+
             if (clients.some(c => c.toLowerCase() === name.toLowerCase())) {
-                alert("Cliente já cadastrado!");
+                alert("Projeto já cadastrado!");
                 return;
             }
+
             clients.push(name);
-            const newActions = generateDefaultActionsForClient(name, "Weslley");
-            actions = [...actions, ...newActions];
+            projectOwners[name] = owner;
 
             saveToFirebase();
             closeNewClientModal();
-            filterByClient(name);
+
+            currentTeamMemberFilter = owner;
+            currentClientFilter = name;
+            document.getElementById("teamMemberFilter").value = owner;
+
+            renderTabs();
+            populateClientDropdowns();
+            render();
         }
 
         function deleteClientPrompt() {
             if (confirm(`Deseja excluir permanentemente o cliente "${currentClientFilter}" e todos os seus dados?`)) {
-                clients = clients.filter(c => c !== currentClientFilter);
-                tickets = tickets.filter(t => t.client !== currentClientFilter);
-                actions = actions.filter(a => a.client !== currentClientFilter);
-                delete sheetsUrlMap[currentClientFilter];
+                const projectToDelete = currentClientFilter;
+                clients = clients.filter(c => c !== projectToDelete);
+                tickets = tickets.filter(t => t.client !== projectToDelete);
+                actions = actions.filter(a => a.client !== projectToDelete);
+                delete sheetsUrlMap[projectToDelete];
+                delete projectOwners[projectToDelete];
 
-                if (clients.length === 0) clients = ["Unidas"];
-                currentClientFilter = clients[0];
+                const visibleProjects = getProjectsForCurrentFilter();
+                currentClientFilter = visibleProjects[0] || "";
                 saveToFirebase();
+                renderTabs();
+                populateClientDropdowns();
+                render();
             }
         }
 
         function filterByClient(client) {
+            if (!getProjectsForCurrentFilter().includes(client)) return;
             currentClientFilter = client;
             renderTabs();
             render();
@@ -541,16 +593,31 @@
 
         function renderTabs() {
             const tabsContainer = document.getElementById("clientTabs");
-            document.getElementById("deleteBtnText").innerText = `Excluir ${currentClientFilter}`;
-            tabsContainer.innerHTML = clients.map(c => `
-                <button onclick="filterByClient('${c}')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${currentClientFilter === c ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
+            const visibleProjects = getProjectsForCurrentFilter();
+
+            document.getElementById("deleteBtnText").innerText =
+                currentClientFilter ? `Excluir ${currentClientFilter}` : "Excluir Projeto";
+
+            if (visibleProjects.length === 0) {
+                tabsContainer.innerHTML =
+                    `<span class="text-sm text-slate-400 px-2">Nenhum projeto atribuído a este responsável.</span>`;
+                return;
+            }
+
+            tabsContainer.innerHTML = visibleProjects.map(c => `
+                <button onclick="filterByClient('${c.replace(/'/g, "\'")}')" class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition ${currentClientFilter === c ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}">
                     ${c}
+                    <span class="ml-1 text-[10px] opacity-75">• ${projectOwners[c] || 'Sem responsável'}</span>
                 </button>
             `).join('');
         }
 
         function populateClientDropdowns() {
-            const options = clients.map(c => `<option value="${c}">${c}</option>`).join('');
+            const visibleProjects = getProjectsForCurrentFilter();
+            const options = visibleProjects.length
+                ? visibleProjects.map(c => `<option value="${c}">${c}</option>`).join('')
+                : `<option value="">Nenhum projeto disponível</option>`;
+
             document.getElementById("formClient").innerHTML = options;
             document.getElementById("actionFormClient").innerHTML = options;
         }
@@ -563,7 +630,16 @@
 
         // Renderização das Ações (filtradas por cliente e responsável)
         function renderActionsSection() {
-            document.getElementById("actionClientTitle").innerText = `- ${currentClientFilter}`;
+            document.getElementById("actionClientTitle").innerText = currentClientFilter ? `- ${currentClientFilter}` : "";
+
+            if (!currentClientFilter) {
+                document.getElementById("actionsProgressPercent").innerText = "0%";
+                document.getElementById("actionsProgressBar").style.width = "0%";
+                document.getElementById("actionsContainer").innerHTML =
+                    `<div class="text-center py-4 text-slate-400 text-xs">Cadastre um projeto para começar.</div>`;
+                return;
+            }
+
             let filteredActions = actions.filter(a => a.client === currentClientFilter);
             if (currentTeamMemberFilter !== "TODOS") {
                 filteredActions = filteredActions.filter(a => a.owner === currentTeamMemberFilter);
@@ -611,6 +687,16 @@
         // Renderização da Tabela de Tickets
         function renderTicketsTable() {
             const search = document.getElementById("searchInput").value.toLowerCase();
+
+            if (!currentClientFilter) {
+                document.getElementById("statTotal").innerText = "0";
+                document.getElementById("statInProgress").innerText = "0";
+                document.getElementById("statWaiting").innerText = "0";
+                document.getElementById("statDone").innerText = "0";
+                document.getElementById("ticketsTableBody").innerHTML = "";
+                document.getElementById("emptyState").classList.remove("hidden");
+                return;
+            }
             const status = document.getElementById("statusFilter").value;
 
             let filtered = tickets.filter(t => {
@@ -660,6 +746,10 @@
 
         // Funções de Modais e Salvamento (Tickets e Ações)
         function openTicketModal(ticket = null) {
+            if (!currentClientFilter && !ticket) {
+                alert("Cadastre um projeto antes de criar um ticket.");
+                return;
+            }
             document.getElementById("ticketModal").classList.remove("hidden");
             populateClientDropdowns();
             if (ticket) {
@@ -708,6 +798,10 @@
         function deleteTicket(id) { if (confirm("Excluir ticket?")) { tickets = tickets.filter(x => x.id !== id); saveToFirebase(); } }
 
         function openActionModal(action = null) {
+            if (!currentClientFilter && !action) {
+                alert("Cadastre um projeto antes de criar uma ação.");
+                return;
+            }
             document.getElementById("actionModal").classList.remove("hidden");
             populateClientDropdowns();
             if (action) {
