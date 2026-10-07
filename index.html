@@ -184,6 +184,10 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nome do Cliente *</label>
                     <input type="text" id="newClientInputName" required placeholder="Ex: Empresa XYZ" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <p class="text-[11px] text-purple-600 mt-1.5 flex items-center gap-1">
+                        <i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i>
+                        Serão criadas automaticamente as 7 ações padrão de implantação.
+                    </p>
                 </div>
                 <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
                     <button type="button" onclick="closeNewClientModal()" class="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">Cancelar</button>
@@ -317,14 +321,39 @@
         const STORAGE_KEY_TICKETS = "vidya_tickets_v2";
         const STORAGE_KEY_ACTIONS = "vidya_actions_v2";
 
-        const defaultClients = ["Unidas", "Social"];
-        const defaultActions = [
-            { id: "act-1", client: "Unidas", title: "Alinhamento Inicial e Mapeamento de APIs 2.0", owner: "Carlos / Vidya", status: "Concluído", dueDate: "2026-09-10", notes: "Escopo validado com a equipe técnica." },
-            { id: "act-2", client: "Unidas", title: "Migração de Credenciais de Homologação", owner: "Suporte", status: "Em Andamento", dueDate: "2026-10-15", notes: "Aguardando envio dos tokens definitivos." },
-            { id: "act-3", client: "Social", title: "Treinamento do Player 2.0 com Time Operacional", owner: "Ana / Vidya", status: "Pendente", dueDate: "2026-10-25", notes: "Agendar reunião com os gestores." }
+        // As 7 ações padrão de implantação para todo novo cliente
+        const DEFAULT_CLIENT_ACTIONS = [
+            "Configuração de ambiente",
+            "Testes internos",
+            "Disponibilização parcial",
+            "Ajustes e correções",
+            "Disponibilização total",
+            "Acompanhamento",
+            "Handoff"
         ];
+
+        const defaultClients = ["Unidas", "Social"];
+
+        // Gera as ações padrão pré-definidas para um determinado cliente
+        function generateDefaultActionsForClient(clientName) {
+            return DEFAULT_CLIENT_ACTIONS.map((actionTitle, index) => ({
+                id: `act-${clientName.toLowerCase().replace(/\s+/g, '-')}-${index + 1}-${Date.now()}`,
+                client: clientName,
+                title: actionTitle,
+                owner: "Equipe Vidya",
+                status: "Pendente",
+                dueDate: "",
+                notes: ""
+            }));
+        }
+
+        const defaultActions = [
+            ...generateDefaultActionsForClient("Unidas"),
+            ...generateDefaultActionsForClient("Social")
+        ];
+
         const defaultTickets = [
-            { id: "101", client: "Unidas", title: "Ajuste na API de Integração de Vídeos", link: "https://jira.exemplo.com/browse/VF-101", description: "Envio de callbacks com timeout intermitente.", status: "Em Andamento", dueDate: "2026-10-15", solution: "Time de infraesturura analisando logs." },
+            { id: "101", client: "Unidas", title: "Ajuste na API de Integração de Vídeos", link: "https://jira.exemplo.com/browse/VF-101", description: "Envio de callbacks com timeout intermitente.", status: "Em Andamento", dueDate: "2026-10-15", solution: "Time de infraestrutura analisando logs." },
             { id: "102", client: "Social", title: "Otimização do player em conexões mobile 4G", link: "https://trello.com/c/vf102", description: "Reduzir buffering no carregamento inicial.", status: "Aberto", dueDate: "2026-10-20", solution: "Planejado para o próximo sprint." }
         ];
 
@@ -459,7 +488,13 @@
                 return;
             }
 
+            // 1. Adiciona o novo cliente
             clients.push(nameInput);
+
+            // 2. Cria automaticamente as 7 ações pré-definidas para o cliente
+            const newDefaultActions = generateDefaultActionsForClient(nameInput);
+            actions = [...actions, ...newDefaultActions];
+
             saveAllData();
             renderTabs();
             populateClientDropdowns();
