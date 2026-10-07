@@ -137,12 +137,12 @@
                 <p id="statTotal" class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">0</p>
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span class="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider">Em Andamento</span>
-                <p id="statInProgress" class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">0</p>
+                <span class="text-xs text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider">Em Andamento</span>
+                <p id="statInProgress" class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">0</p>
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span class="text-xs text-amber-600 dark:text-amber-400 font-semibold uppercase tracking-wider">Aguardando Cliente</span>
-                <p id="statWaiting" class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">0</p>
+                <span class="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider">Aguardando Cliente</span>
+                <p id="statWaiting" class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">0</p>
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
                 <span class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">Concluídos</span>
@@ -182,7 +182,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                            <th class="p-4">Projeto</th>
+                            <th class="p-4">ID / Projeto</th>
                             <th class="p-4">Título & Descrição</th>
                             <th class="p-4">Responsável</th>
                             <th class="p-4">Link</th>
@@ -257,6 +257,10 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">URL do Web App (Google Apps Script deste Cliente) *</label>
                     <input type="url" id="sheetsUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full text-sm border border-slate-300 dark:border-slate-600 rounded-lg p-2.5 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div class="text-xs text-slate-500 space-y-1 bg-slate-50 dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <p class="font-bold text-slate-700 dark:text-slate-300">Dica de formatação para o Apps Script:</p>
+                    <p>O script irá criar abas bem formatadas e identadas para <b>Ações</b> e <b>Tickets</b> com cores nos status (Amarelo para 'Em Andamento', Verde para 'Concluído').</p>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeSheetsConfigModal()" class="px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">Cancelar</button>
@@ -414,13 +418,27 @@
             "Handoff"
         ];
 
+        // Novos tickets a serem inseridos/garantidos no projeto "Social"
+        const INITIAL_SOCIAL_TICKETS = [
+            { id: "#001", client: "Social", title: "Erro imposto", link: "https://vidyacode.atlassian.net/browse/ARANDU-1046", dueDate: "2026-10-21", status: "Em Andamento", description: "Resumo: O aplicativo novo está calculando os impostos de forma inconsistente em comparação ao sistema principal ou ao app antigo.\n\nPasso a passo para reproduzir:\n1. Abrir o aplicativo de vendas e pesquisar pelo item código 239.\n2. Iniciar um pedido utilizando o cliente 33063 - JOSE DE ARAUJO GOMES JUNIOR e o tipo de negociação \"À Vista Dinheiro\".\n3. Observar que o valor do imposto e o valor total do produto divergem entre as telas de detalhamento do aplicativo e os registros do Sankhya.", solution: "", owner: "Weslley" },
+            { id: "#002", client: "Social", title: "Quantidade sendo adicionada e nao totalizando", link: "", dueDate: "", status: "Aberto", description: "", solution: "", owner: "Weslley" },
+            { id: "#003", client: "Social", title: "Lentidão na pesquisa de produtos", link: "", dueDate: "", status: "Aberto", description: "", solution: "", owner: "Weslley" },
+            { id: "#004", client: "Social", title: "Pesquisa GP30120", link: "", dueDate: "", status: "Aguardando Cliente", description: "Ao pesquisar pela referencia GP30120, cliente informa que esta aparecendo item que não deveria", solution: "Verificamos que a referencia GP30120 está contida na descrição do item 166262, por isso ele retorna o item na pesquisa, precisa verificar se o parâmetro de pesquisa está por código, descrição, referencia ou todos.", owner: "Weslley" },
+            { id: "#005", client: "Social", title: "Adicionar marca", link: "", dueDate: "", status: "Aberto", description: "", solution: "", owner: "Weslley" },
+            { id: "#006", client: "Social", title: "Estoque divergente entre antigo e novo", link: "", dueDate: "", status: "Aberto", description: "", solution: "", owner: "Weslley" },
+            { id: "#007", client: "Social", title: "Valor diferente item 117696", link: "", dueDate: "", status: "Aberto", description: "", solution: "", owner: "Weslley" },
+            { id: "#008", client: "Social", title: "Letra pequena no Tablet", link: "", dueDate: "", status: "Aberto", description: "", solution: "", owner: "Weslley" },
+            { id: "#009", client: "Social", title: "Pedido Faturado no 2.0 e Aguardando Faturamento no antigo", link: "", dueDate: "", status: "Aberto", description: "", solution: "", owner: "Weslley" },
+            { id: "#010", client: "Social", title: "Promoções cadastradas não são consideradas na busca do aplicativo (Item 299)", link: "https://vidyacode.atlassian.net/browse/ARANDU-1047", dueDate: "2026-10-21", status: "Em Andamento", description: "Resumo: Produtos que possuem preço promocional ativo (como o item 299) não estão respeitando a promoção ou demoram a aparecer corretamente quando filtrados na busca do aplicativo.\n\nPasso a passo para reproduzir:\n1. Cadastrar ou garantir que exista uma promoção ativa para o produto 299 no gerenciador.\n2. Realizar a sincronização completa de promoções e atualizações no aplicativo.\n3. Buscar pelo item na aba de promoções ou na listagem geral e verificar que o sistema continua exibindo o preço cheio ou falha em aplicar a condição promocional.", solution: "", owner: "Weslley" }
+        ];
+
         let clients = [];
         let projectOwners = {};
         let tickets = [];
         let actions = [];
         let sheetsUrlMap = {};
 
-        let currentClientFilter = "";
+        let currentClientFilter = "Social";
         let currentTeamMemberFilter = "TODOS";
         let isActionsSectionOpen = true;
 
@@ -467,25 +485,15 @@
                 const data = snapshot.val();
 
                 if (data) {
-                    if (!data.projectMigrationV2) {
-                        clients = [];
-                        projectOwners = {};
-                        tickets = [];
-                        actions = [];
-                        sheetsUrlMap = {};
-                        saveToFirebase(true);
-                        return;
-                    }
-
                     clients = Array.isArray(data.clients) ? data.clients : [];
                     projectOwners = data.projectOwners || {};
                     tickets = data.tickets || [];
                     actions = data.actions || [];
                     sheetsUrlMap = data.sheetsUrlMap || {};
-                } else {
-                    seedInitialData();
-                    return;
                 }
+
+                // Garantir existência do projeto Social e seus tickets perdidos
+                ensureSocialProjectWithTickets();
 
                 const visibleProjects = getProjectsForCurrentFilter();
                 if (!visibleProjects.includes(currentClientFilter)) {
@@ -498,22 +506,48 @@
             });
         }
 
-        function seedInitialData() {
-            clients = [];
-            projectOwners = {};
-            tickets = [];
-            actions = [];
-            sheetsUrlMap = {};
-            saveToFirebase(true);
+        function ensureSocialProjectWithTickets() {
+            let updated = false;
+
+            if (!clients.includes("Social")) {
+                clients.push("Social");
+                projectOwners["Social"] = "Weslley";
+                
+                DEFAULT_ACTION_TITLES.forEach((title, index) => {
+                    actions.push({
+                        id: "act-social-" + index,
+                        client: "Social",
+                        title: title,
+                        owner: "Weslley",
+                        status: "Pendente",
+                        dueDate: "",
+                        notes: ""
+                    });
+                });
+                updated = true;
+            }
+
+            // Inserir tickets recuperados caso não existam
+            INITIAL_SOCIAL_TICKETS.forEach(newTicket => {
+                const exists = tickets.some(t => t.client === "Social" && t.id === newTicket.id);
+                if (!exists) {
+                    tickets.push(newTicket);
+                    updated = true;
+                }
+            });
+
+            if (updated) {
+                saveToFirebase();
+            }
         }
 
-        function saveToFirebase(forceEmpty = false) {
+        function saveToFirebase() {
             db.ref("vidya_data").set({
-                clients: forceEmpty ? [] : clients,
-                projectOwners: forceEmpty ? {} : projectOwners,
-                tickets: forceEmpty ? [] : tickets,
-                actions: forceEmpty ? [] : actions,
-                sheetsUrlMap: forceEmpty ? {} : sheetsUrlMap,
+                clients: clients,
+                projectOwners: projectOwners,
+                tickets: tickets,
+                actions: actions,
+                sheetsUrlMap: sheetsUrlMap,
                 projectMigrationV2: true
             }).then(() => {
                 if (currentClientFilter) syncWithGoogleSheets(currentClientFilter);
@@ -522,7 +556,7 @@
             });
         }
 
-        // Sincronização ajustada para evitar travamentos de CORS com o Apps Script
+        // Sincronização com o Google Sheets
         function syncWithGoogleSheets(clientName) {
             const clientSheetsUrl = sheetsUrlMap[clientName];
             if (!clientSheetsUrl) return;
@@ -586,7 +620,6 @@
             clients.push(name);
             projectOwners[name] = owner;
 
-            // Cadastro automático das 7 etapas de implantação com o responsável do projeto
             DEFAULT_ACTION_TITLES.forEach((title, index) => {
                 actions.push({
                     id: "act-" + Date.now() + "-" + index,
@@ -673,6 +706,21 @@
             lucide.createIcons();
         }
 
+        // Função utilitária de badge de status (Amarelo para Em Andamento, Verde para Concluído)
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'Em Andamento':
+                    return 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/50 dark:text-amber-300 dark:border-amber-700/60 font-bold';
+                case 'Concluído':
+                    return 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/50 dark:text-emerald-300 dark:border-emerald-700/60 font-bold';
+                case 'Aguardando Cliente':
+                    return 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700/60';
+                case 'Aberto':
+                default:
+                    return 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600';
+            }
+        }
+
         function renderActionsSection() {
             document.getElementById("actionClientTitle").innerText = currentClientFilter ? `- ${currentClientFilter}` : "";
 
@@ -702,7 +750,9 @@
                 return;
             }
 
-            container.innerHTML = filteredActions.map(a => `
+            container.innerHTML = filteredActions.map(a => {
+                const actionBadgeStyle = getStatusBadgeClass(a.status);
+                return `
                 <div class="bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -716,16 +766,16 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <select onchange="updateActionStatus('${a.id}', this.value)" class="text-xs font-semibold px-2 py-1 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 cursor-pointer">
+                        <select onchange="updateActionStatus('${a.id}', this.value)" class="text-xs font-semibold px-2.5 py-1 rounded-lg border cursor-pointer transition ${actionBadgeStyle}">
                             <option value="Pendente" ${a.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                            <option value="Em Andamento" ${a.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
-                            <option value="Concluído" ${a.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                            <option value="Em Andamento" ${a.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento 🟡</option>
+                            <option value="Concluído" ${a.status === 'Concluído' ? 'selected' : ''}>Concluído 🟢</option>
                         </select>
                         <button onclick="editAction('${a.id}')" class="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                         <button onclick="deleteAction('${a.id}')" class="p-1 text-slate-400 hover:text-red-600 dark:hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderTicketsTable() {
@@ -746,7 +796,9 @@
                 const matchClient = t.client === currentClientFilter;
                 const matchStatus = status === "TODOS" || t.status === status;
                 const matchMember = currentTeamMemberFilter === "TODOS" || t.owner === currentTeamMemberFilter;
-                const matchSearch = t.title.toLowerCase().includes(search) || (t.description && t.description.toLowerCase().includes(search));
+                const matchSearch = t.title.toLowerCase().includes(search) || 
+                                    (t.description && t.description.toLowerCase().includes(search)) ||
+                                    (t.id && t.id.toLowerCase().includes(search));
                 return matchClient && matchStatus && matchMember && matchSearch;
             });
 
@@ -765,26 +817,47 @@
             }
             emptyState.classList.add("hidden");
 
-            tbody.innerHTML = filtered.map(t => `
+            tbody.innerHTML = filtered.map(t => {
+                const badgeStyle = getStatusBadgeClass(t.status);
+                const formattedDesc = t.description ? t.description.replace(/\n/g, '<br>') : '';
+                const formattedSol = t.solution ? t.solution.replace(/\n/g, '<br>') : '-';
+
+                return `
                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition">
-                    <td class="p-4 whitespace-nowrap"><span class="font-semibold text-purple-900 dark:text-purple-200 bg-purple-50 dark:bg-purple-900/40 px-2 py-1 rounded text-xs">${t.client}</span></td>
-                    <td class="p-4">
-                        <div class="font-semibold text-slate-800 dark:text-slate-100">${t.title}</div>
-                        ${t.description ? `<div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">${t.description}</div>` : ''}
+                    <td class="p-4 whitespace-nowrap">
+                        <span class="font-bold text-xs text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/50 px-2 py-1 rounded-md">
+                            ${t.id ? t.id : '#'}
+                        </span>
                     </td>
-                    <td class="p-4 whitespace-nowrap"><span class="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded">${t.owner || 'Weslley'}</span></td>
+                    <td class="p-4 max-w-xs md:max-w-sm">
+                        <div class="font-bold text-slate-800 dark:text-slate-100 text-sm">${t.title}</div>
+                        ${formattedDesc ? `<div class="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed bg-slate-100 dark:bg-slate-900/50 p-2 rounded border border-slate-200 dark:border-slate-700 max-h-32 overflow-y-auto">${formattedDesc}</div>` : ''}
+                    </td>
+                    <td class="p-4 whitespace-nowrap">
+                        <span class="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-1 rounded">
+                            ${t.owner || 'Weslley'}
+                        </span>
+                    </td>
                     <td class="p-4 whitespace-nowrap text-xs">
-                        ${t.link ? `<a href="${t.link}" target="_blank" class="text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Chamado</a>` : '-'}
+                        ${t.link ? `<a href="${t.link}" target="_blank" class="text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1 font-medium bg-purple-50 dark:bg-purple-950/50 px-2.5 py-1 rounded border border-purple-200 dark:border-purple-800"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Abrir Ticket</a>` : '-'}
                     </td>
-                    <td class="p-4 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300">${t.dueDate ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-'}</td>
-                    <td class="p-4 whitespace-nowrap"><span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">${t.status}</span></td>
-                    <td class="p-4 text-xs text-slate-600 dark:text-slate-300">${t.solution || '-'}</td>
+                    <td class="p-4 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300 font-medium">
+                        ${t.dueDate ? new Date(t.dueDate + 'T00:00:00').toLocaleDateString('pt-BR') : '-'}
+                    </td>
+                    <td class="p-4 whitespace-nowrap">
+                        <span class="px-2.5 py-1 rounded-full text-xs border ${badgeStyle}">
+                            ${t.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-xs text-slate-600 dark:text-slate-300 max-w-xs">
+                        <div class="max-h-28 overflow-y-auto leading-relaxed">${formattedSol}</div>
+                    </td>
                     <td class="p-4 text-center whitespace-nowrap">
                         <button onclick="editTicket('${t.id}')" class="p-1 text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400"><i data-lucide="pencil" class="w-4 h-4"></i></button>
                         <button onclick="deleteTicket('${t.id}')" class="p-1 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         // Funções de Modais
@@ -832,11 +905,14 @@
                 const idx = tickets.findIndex(t => t.id === id);
                 if (idx !== -1) tickets[idx] = { id, client, owner, title, link, status, dueDate, description, solution };
             } else {
-                tickets.push({ id: Date.now().toString(), client, owner, title, link, status, dueDate, description, solution });
+                const nextNum = (tickets.filter(t => t.client === client).length + 1).toString().padStart(3, '0');
+                const newId = `#${nextNum}`;
+                tickets.push({ id: newId, client, owner, title, link, status, dueDate, description, solution });
             }
             saveToFirebase();
             closeTicketModal();
         }
+
         function editTicket(id) { const t = tickets.find(x => x.id === id); if (t) openTicketModal(t); }
         function deleteTicket(id) { if (confirm("Excluir ticket?")) { tickets = tickets.filter(x => x.id !== id); saveToFirebase(); } }
 
@@ -885,6 +961,7 @@
             saveToFirebase();
             closeActionModal();
         }
+
         function updateActionStatus(id, newStatus) {
             const a = actions.find(x => x.id === id);
             if (a) { a.status = newStatus; saveToFirebase(); }
